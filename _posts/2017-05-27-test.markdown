@@ -1,0 +1,27 @@
+---
+layout:     post
+title:      "Test"
+subtitle:   " \Hello Blog\"
+date:       2017-05-27 12:00:00
+author:     "Damon Du"
+header-img: "img/post-bg-2017.jpg"
+catalog: true
+tags:
+    - 闲谈
+---
+
+> “Test”
+
+# 测试一级标题
+
+## 测试二级标题
+
+测试正文。
+
+[测试链接 ](#build) 
+
+## <p id = "build"></p>
+
+## 正文
+
+测试
