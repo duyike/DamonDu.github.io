@@ -1,15 +1,17 @@
 ---
 layout:     post
-title:      "Unity3D开发：恶魔与牧师小游戏"
+title:      "Unity3D开发(一)：恶魔与牧师小游戏"
 subtitle:   "上手MVC架构"
 date:       2017-06-01 01:50:00
 author:     "Damon Du"
 header-img: "img/unity-bg.jpg"
-header-mask: 0.1
+header-mask: 0.５
 catalog:    true
 tags:
     - Unity3D
 ---
+
+> 本篇是Unity3D开发的开篇。《恶魔与牧师》是许多游戏制作者入门时都会选择尝试的一个小游戏。通过这个游戏项目，新手开发者可以练习Unity3D最基本的游戏对象操作、动作管理器等简单但重要的内容。此外，本项目使用到MVC架构，作为最基础的架构方案，新手游戏开发者也很有了解学习的必要。
 
 ## V2.0更新说明
 
