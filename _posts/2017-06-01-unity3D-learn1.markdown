@@ -5,7 +5,7 @@ subtitle:   "上手MVC架构"
 date:       2017-06-01 01:50:00
 author:     "Damon Du"
 header-img: "img/unity-bg.jpg"
-header-mask: 3.0
+header-mask: 2.0
 catalog:    true
 tags:
     - Unity3D
