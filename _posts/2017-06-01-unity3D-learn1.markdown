@@ -58,6 +58,8 @@ tags:
 
 ## 重点展示
 
+​	完整代码地址: [GitHub - DamonDu/Unity3D_Training/PriestsAndDevils](https://github.com/DamonDu/Unity3D_Training/tree/master/PriestsAndDevils)
+
 ​	关于逻辑实现，考虑的是数据结构尽量从简，以减少游戏消耗。所以这里采用最朴素的对象数组来储存逻辑对象。下面是`SenceModel`的关于这部分的部分代码：
 
 ```c#
