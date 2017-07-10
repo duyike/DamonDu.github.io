@@ -4,7 +4,7 @@ title:      "记一次网易游戏面试经历"
 subtitle:   "第一次...面试"
 date:       2017-07-10 23:00:00
 author:     "Damon To"
-header-img: "img/NeteaseInterview01"
+header-img: "img/NeteaseInterview01.jpg"
 header-mask: 0.6
 catalog:    true
 tags:
