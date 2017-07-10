@@ -3,7 +3,7 @@ layout:     post
 title:      "Unity3D开发(二):简单工厂模式"
 subtitle:   "正确管理游戏对象"
 date:       2017-06-02 12:30:00
-author:     "Damon Du"
+author:     "Damon To"
 header-img: "img/unity-bg1.jpg"
 header-mask: 0.3
 catalog:    true

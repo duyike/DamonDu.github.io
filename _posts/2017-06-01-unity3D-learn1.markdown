@@ -3,7 +3,7 @@ layout:     post
 title:      "Unity3D开发(一)：恶魔与牧师小游戏"
 subtitle:   "上手MVC架构"
 date:       2017-06-01 01:50:00
-author:     "Damon Du"
+author:     "Damon To"
 header-img: "img/unity-bg.jpg"
 header-mask: 0.6
 catalog:    true

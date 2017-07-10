@@ -3,7 +3,7 @@ layout:     post
 title:      "Unity3D开发(五):DOTween 插件仿写"
 subtitle:   "造轮子从仿造开始"
 date:       2017-06-08 13:00:00
-author:     "Damon Du"
+author:     "Damon To"
 header-img: "img/unity-bg.jpg"
 header-mask: 0.3
 catalog:    true

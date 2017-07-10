@@ -3,7 +3,7 @@ layout:     post
 title:      "Hello SplitMusic"
 subtitle:   "hello blog"
 date:       2017-05-28 00:50:00
-author:     "Damon Du"
+author:     "Damon To"
 header-img: "img/about-bg.jpg"
 header-mask: 0.3
 catalog:    true
