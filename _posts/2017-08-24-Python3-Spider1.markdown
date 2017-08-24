@@ -151,7 +151,7 @@ def getDate(html):
 
 类似地，也是使用正则匹配的方法。另外，这里我在获取第一个日期字符串后，将其转为`datetime`对象，以使用`datetime`的相关方法来计算得出剩余九个需要获取的日期。
 
-###(三)静态本地存储
+### (三)静态本地存储
 
 ```python
 def writeDown(content):
