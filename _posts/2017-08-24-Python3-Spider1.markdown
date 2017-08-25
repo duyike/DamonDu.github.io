@@ -131,7 +131,7 @@ http://www.allmusic.com/newreleases/20170804
 ...
 ```
 
-不难想到，我们只要获取所有的日期并以**’YYYYMMDD‘**的形式添加在基础url上，就可以得到最终的url。通过一下方法，我们可以从网页中获取日期信息：
+不难想到，我们只要获取所有的日期并以**’YYYYMMDD‘**的形式添加在基础url上，就可以得到最终的url。通过以下方法，我们可以从网页中获取日期信息：
 
 ```python
 def getDate(html):
