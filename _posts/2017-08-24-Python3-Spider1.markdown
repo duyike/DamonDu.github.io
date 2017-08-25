@@ -56,7 +56,7 @@ def getOnePage(url, headers):
 
 这里我们需要爬取两方面的信息：一是我们需要获取的New Releases 的内容；二是需要从网页中获取日期信息来构成url(当然也可以直接通过算法计算，Allmusic 的更新日期是每周的周五)。
 
-####析取 New Releases 中的内容
+#### 析取 New Releases 中的内容
 
 ![](http://ompnv884d.bkt.clouddn.com/spider2.jpg)
 
