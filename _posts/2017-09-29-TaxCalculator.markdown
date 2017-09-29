@@ -5,7 +5,7 @@ subtitle:   "—— 基于 Java + JS 实现"
 date:       2017-09-29 13:35:00
 author:     "Damon To"
 header-img: "img/TaxCalculator.jpg"
-header-mask: 0.3
+header-mask: 0.5
 catalog:    true
 tags:
     - Java
