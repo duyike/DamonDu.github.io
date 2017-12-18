@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "深入理解Java虚拟机读书笔记(二)"
+title:      "深入理解Java虚拟机:读书笔记(二)"
 subtitle:   "虚拟机执行子系统"
 date:       2017-12-17 23:30:00
 author:     "Damon To"
