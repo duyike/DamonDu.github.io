@@ -57,7 +57,7 @@ tags:
 - **区分 Exceptions 属性与异常表：**
   - Exceptions 属性与 Code 属性平级，作用是列举出方法中可能抛出的受查异常（Checked Exceptions）
   - 异常表属于 Code 属性，作用是实现 Java 异常和 finally 处理机制
-- Signature 属性，用于记录泛型签名信息
+- Signature 属性，用于存储一个方法在字节码层面的特征签名。这个属性保存的不是原生类型，而是参数化类型的信息，是通过反射取得参数化类型的根本依据
 - BootstrapMethods 属性，用于保存 invokedynamic 指令引用的引导方法限定符
 - 在 Java 虚拟机指令集中，大多数指令都包含了其操作所对应的数据类型信息
 - Java 编译器会在将 byte 和 short 型数据带符号扩展，将 boolean 和 char 类型数据零位扩展成对应的 int 类型数据
