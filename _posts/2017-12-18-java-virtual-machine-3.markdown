@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "深入理解Java虚拟机读书笔记(三)"
+title:      "深入理解Java虚拟机:读书笔记(三)"
 subtitle:   "程序编译与代码优化"
 date:       2017-12-18 22:00:00
 author:     "Damon To"
