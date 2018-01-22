@@ -1,78 +1,138 @@
-.wall *, *:before, *:after {
-    box-sizing: border-box;
+.aspect-ratio {
+    height: 0;
+    position: relative;
 }
 
-.wall .infomation p {
-    font-size: 82%;
-    margin: 13.12px 0;
+.aspect-ratio--1x1 {
+    padding-bottom: 100%;
 }
 
-.wall .infomation {
-	padding-left: 170px;
-	padding-top: 0.02px;
+.aspect-ratio--object {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
 }
 
-.wall .cover {
-	float: left;
+.cover {
+    background-size: cover !important;
 }
 
-.wall .head {
-	margin-bottom: 30px;
+.bg-center {
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
-.wall .post {
-    padding-bottom: 30px;
-    margin-top: 0px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #e8e8e8;
+.cf:before, .cf:after {
+    content: " ";
+    display: table;
 }
 
-.wall .card {
-    padding: 30px;
-    background-color: #fff;
-    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+.cf:after {
+    clear: both;
 }
 
-.wall article, aside, footer, header, hgroup, main, nav, section {
+.cf {
+    *zoom: 1;
+}
+
+.db {
     display: block;
 }
 
-@media screen and (max-width: 800px)
-.wall .container {
-    max-width: -webkit-calc(800px - (30px));
-    max-width: calc(800px - (30px));
-    padding-right: 15px;
-    padding-left: 15px;
+.fl {
+    float: left;
+    _display: inline;
 }
 
-.wall .container {
-    max-width: -webkit-calc(1000px - (30px * 2));
-    max-width: calc(1000px - (30px * 2));
-    margin-right: auto;
-    margin-left: auto;
-    padding-right: 30px;
-    padding-left: 30px;
-}
-
-.wall h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    line-height: 1em;
-    margin: 0 0 0.8em 0;
-}
-
-.wall body, input, select, textarea {
-    color: #404040;
-    font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB",STHeiti,"Microsoft YaHei","Microsoft JhengHei","Source Han Sans SC","Noto Sans CJK SC","Source Han Sans CN","Noto Sans SC","Source Han Sans TC","Noto Sans CJK TC","WenQuanYi Micro Hei",SimSun,sans-serif;;
-    font-size: 16px;
+.fw4 {
     font-weight: 400;
-    line-height: 1.6;
 }
 
-.wall body {
-    background-color: #ebebeb;
-    font-size: 16px;
-    font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB",STHeiti,"Microsoft YaHei","Microsoft JhengHei","Source Han Sans SC","Noto Sans CJK SC","Source Han Sans CN","Noto Sans SC","Source Han Sans TC","Noto Sans CJK TC","WenQuanYi Micro Hei",SimSun,sans-serif;;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    letter-spacing: .01em;
+.link {
+    text-decoration: none;
+    transition: color .15s ease-in;
+}
+
+.link:link, .link:visited {
+    transition: color .15s ease-in;
+}
+
+.link:hover {
+    transition: color .15s ease-in;
+}
+
+.link:active {
+    transition: color .15s ease-in;
+}
+
+.link:focus {
+    transition: color .15s ease-in;
+    outline: 1px dotted currentColor;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.black-90 {
+    color: rgba(0, 0, 0, .9);
+}
+
+.black-60 {
+    color: rgba(0, 0, 0, .6);
+}
+
+.pb3 {
+    padding-bottom: 1rem;
+}
+
+.ph2 {
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+
+.mb0 {
+    margin-bottom: 0;
+}
+
+.mt2 {
+    margin-top: .5rem;
+}
+
+.f5 {
+    font-size: 1rem;
+}
+
+.f6 {
+    font-size: .875rem;
+}
+
+@media screen and (min-width: 30em) {
+    .w-25-ns {
+        width: 25%;
+    }
+
+    .pa2-ns {
+        padding: .5rem;
+    }
+
+    .ph0-ns {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .f4-ns {
+        font-size: 1.25rem;
+    }
+}
+
+@media screen and (min-width: 30em) and (max-width: 60em) {
+    .w-50-m {
+        width: 50%;
+    }
 }
