@@ -4,8 +4,8 @@ title:      " Java 并发学习笔记(一)"
 subtitle:   "并发基础知识"
 date:       2018-2-05 16:00:00
 author:     "Damon To"
-header-img: "img/java-virtual-machine.jpeg"
-header-mask: 0.5
+header-img: "img/java-concurrency.jpg"
+header-mask: 0.7
 catalog:    true
 tags:
     - Java
