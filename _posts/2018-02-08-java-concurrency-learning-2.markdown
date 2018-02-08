@@ -5,7 +5,7 @@ subtitle:   "结构化并发应用程序"
 date:       2018-2-08 19:00:00
 author:     "Damon To"
 header-img: "img/java-concurrency.jpg"
-header-mask: 0.3
+header-mask: 0.6
 catalog:    true
 tags:
     - Java
