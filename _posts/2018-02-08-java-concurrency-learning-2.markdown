@@ -12,7 +12,7 @@ tags:
     - Concurrency
 ---
 
-> 这是我阅读[《 Java 并发编程实战》](https://book.douban.com/subject/10484692/)整理出的知识大纲，第二部分主要是一些关于 Java 中如何使用 Executor 框架和线程池等技术来结构化地管理多线程应用程序。
+> 这是我阅读[《 Java 并发编程实战》](https://book.douban.com/subject/10484692/)整理出的知识大纲，第二部分主要是关于 Java 中如何使用 Executor 框架和线程池等技术来结构化地管理多线程应用程序。
 
 ### Before Reading
 
