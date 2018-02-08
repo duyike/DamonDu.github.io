@@ -5,7 +5,7 @@ subtitle:   "并发基础知识"
 date:       2018-2-05 16:00:00
 author:     "Damon To"
 header-img: "img/java-concurrency.jpg"
-header-mask: 0.7
+header-mask: 0.3
 catalog:    true
 tags:
     - Java
