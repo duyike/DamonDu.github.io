@@ -353,12 +353,8 @@ tags:
 
   * 对于 CPU 资源的限制
 
-  $$
-  N_{cpu}=number\;of\;CPUs\\
-  U_{cpu}=target\;CPU\;utilization,0\leq U_{cpu}\leq1\\
-  \frac{W}{C}=ratio\;of\;wait\;time\;to\;compute\;time\\
-  最优大小：N_{threads}=N_{cpu}*U_{cpu}*(1+\frac{W}{C})
-  $$
+  ![](http://ompnv884d.bkt.clouddn.com/%E8%AE%A1%E7%AE%97%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E6%9C%80%E4%BC%98%E5%A4%A7%E5%B0%8F.png)
+
   * 对于其他资源的限制：计算每个任务对该资源的需求量，然后用该资源的可用总量除以每个任务的需求量，所得结果就是线程池大小的上限。
   * 线程池和资源池（如：数据连接池）的大小将会相互影响。
 
