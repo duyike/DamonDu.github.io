@@ -15,7 +15,7 @@ tags:
 
 > Java Web 开发中，SSH 框架（Struts + Spring + Hibernate）和 SSM 框架（Spring + SpringMVC + MyBatis）是最常见的两个集成框架。它们很好地利用了 Spring IoC 特性，极大程度地减少了代码量和降低了代码之间的耦合度。之前看了一些 Spring Core 和 SpringMVC 的内容，但总觉得对 IoC 和 AOP 等概念没有很深刻的理解。通过这次动手配置 SSM 框架，真的是深刻体会到 Spring IoC 和 Bean 在实际开发中的重要意义。
 >
-> 项目地址：https://github.com/DamonDu/ssmTest
+> 项目地址：[https://github.com/DamonDu/ssmTest](https://github.com/DamonDu/ssmTest)
 
 ### (一) 项目回顾
 
@@ -50,15 +50,15 @@ tags:
 ```
 ssmTest
 	|pom.xml			# maven配置文件
-	|src			    # 源代码
+	|src				# 源代码
 	  |test				# 测试文件
 	  |main				
 	    |java			# java文件
-	    |resources	     # xml等配置文件
+	    |resources		# xml等配置文件
 	    	|mapper		# mybatis mapper配置文件
 	    	|spring		# spring相关配置文件
 	    |webapp			# Web层
-	    |sql		    # SQL文件
+	    |sql			# SQL文件
 ```
 
 在 java 文件夹中创建必要的包，我将包的命名空间统一为 `cn.damonto.ssmTest`：
@@ -78,7 +78,7 @@ java
 
 提前建立好文件夹与包是必要的，这让我们后续的开发更有条理。
 
-###(三) 配置 pom.xml
+### (三) 配置 pom.xml
 
 `pom.xml` 即为 maven 工程实现依赖管理的配置文件。在本项目中，除了必要的 Spring（包括核心库、Dao、test 等）、SpringMVC 和 MyBatis，还需要导入的依赖有：junit（单元测试）、mysql-connector-java（MySQL数据库连接）、c3p0（一个数据库连接池）、mybatis-spring（用于整合 Spring 与 MyBatis）......
 
@@ -460,8 +460,8 @@ SSM 框架和 SSH 框架几乎可以适用于所有场景的 Java Web 开发，�
 
 *参考网站：*
 
-1. *Github - liyifeng1994/ssm：https://github.com/liyifeng1994/ssm*
+1. *Github - liyifeng1994/ssm：[https://github.com/liyifeng1994/ssm](https://github.com/liyifeng1994/ssm)*
 2. *Spring 中 property-placeholder 的使用与解析：[https://www.cnblogs.com/leftthen/p/5615066.html](https://www.cnblogs.com/leftthen/p/5615066.html)*
 3. *mybatis-spring document：[http://www.mybatis.org/spring/zh/](http://www.mybatis.org/spring/zh/)*
-4. *Ant风格路径表达式详解：http://www.bug315.com/article/131.htm*
-5. *c3p0数据库连接池的使用详解：https://www.cnblogs.com/fingerboy/p/5184398.html*
+4. *Ant风格路径表达式详解：[http://www.bug315.com/article/131.htm](http://www.bug315.com/article/131.htm)*
+5. *c3p0数据库连接池的使用详解：[https://www.cnblogs.com/fingerboy/p/5184398.html](https://www.cnblogs.com/fingerboy/p/5184398.html)*
