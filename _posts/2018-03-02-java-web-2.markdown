@@ -431,7 +431,6 @@ public class BookDaoTest extends BaseTest{
         System.out.println("Update = " + number);
     }
 }
-
 ```
 
 > 由于 BookDao 的实现是有 MyBatis 在运行时才进行的，所以编译时会发现 `bookDao` 的 bean 装载会提示错误，这个错误同样是可以忽视的。
