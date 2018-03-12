@@ -2,7 +2,7 @@
 layout:     post
 title:      "Java 沉思录(二)：关于 String"
 subtitle:   "从源码角度分析"
-date:       2017-03-13 03:25:00
+date:       2018-03-13 03:25:00
 author:     "Damon To"
 header-img: "img/ruminations-java.jpg"
 header-mask: 0.6
@@ -151,7 +151,7 @@ public StringJoiner add(CharSequence newElement) {
 
 `prepareBuilder()` 顾名思义，创建并初始化了一个 StringBuilder 对象。在这里可以看出，String 中的 `join()`方法在实现中是基于 StringBuilder 的 `append()` 方法实现。也正是由于这个优化，才提高了在使用 ”+“ 对多个字符串进行拼接时的性能。
 
-而至于 StringBuffer，除了和 StringBuilder 一样是可变的之外，还增加了多线程下的线程安全保证。所以在这三者之间进行选择时，一是我们要**根据字符串修改是否频繁来决定使用 String 还是 StringBuilder 和 StringBuffer**；二是要根**据是否处于多线程环境来觉得使用 StringBuilder 或是 StringBuffer**。
+而至于 StringBuffer，除了和 StringBuilder 一样是可变的之外，还增加了多线程下的线程安全保证。所以在这三者之间进行选择时，一是我们要**根据字符串修改是否频繁来决定使用 String 还是 StringBuilder 和 StringBuffer**；二是要**根据是否处于多线程环境来决定使用 StringBuilder 或是 StringBuffer**。
 
 ------
 
