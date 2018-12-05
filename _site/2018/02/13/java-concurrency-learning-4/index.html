@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title> Java 并发学习笔记(四) - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2018/02/13/java-concurrency-learning-4/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/java-concurrency.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/java-concurrency.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.6);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#Concurrency" title="Concurrency">Concurrency</a>
+                        
+                    </div>
+                    <h1> Java 并发学习笔记(四)</h1>
+                    
+                    
+                    <h2 class="subheading">高级主题</h2>
+                    
+                    <span class="meta">Posted by Damon To on February 13, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>这是我阅读<a href="https://book.douban.com/subject/10484692/">《 Java 并发编程实战》</a>整理出的知识大纲，第四部分主要是关于 Java 并发的高级内容，主要包括：显示锁、条件队列、AQS、原子变量、非阻塞算法以及 JVM 中关于并发的一些底层细节。</p>
+</blockquote>
+
+<h3 id="before-reading">Before Reading</h3>
+
+<ol>
+  <li>本篇文章对应原书 13~16 章的内容。</li>
+  <li>建议通读过原书的对应内容后再使用这份知识大纲。</li>
+  <li>大部分内容为原书的摘抄，少部分是我自己的归纳。</li>
+  <li>文章中的代码是从原书 example 中摘抄得来，你可以从<a href="http://jcip.net/listings.html">原书官网</a>获取完整的代码。</li>
+</ol>
+
+<h3 id="显式锁">显式锁</h3>
+
+<h4 id="lock-与-reentrantlock">Lock 与 ReentrantLock</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">Lock</code> 提供了一种<strong>无条件的</strong>、<strong>可轮询的</strong>、<strong>定时的</strong>以及<strong>可中断的</strong>锁获取操作，所有加锁和解锁的方法都是<strong>显式的</strong>。</li>
+  <li><code class="highlighter-rouge">ReentrantLock</code> 实现了 <code class="highlighter-rouge">Lock</code> 接口，提供了与 <code class="highlighter-rouge">synchronized</code> 相同的<strong>互斥性和内存可见性</strong> ；提供了可重入的加锁语义；支持在Lock接口中定义的所有获取锁模式；为处理锁的不可用性问题提供了更高的灵活性。</li>
+  <li><strong>为什么要创建一种与内置锁如此相似的新加锁机制？</strong>
+    <ul>
+      <li>内置锁无法中断一个正在等待获取锁的线程。</li>
+      <li>内置锁无法在请求获取一个锁时无限地等待下去。</li>
+      <li>内置锁无法实现非阻塞结构的加锁规则。</li>
+    </ul>
+  </li>
+  <li><strong><code class="highlighter-rouge">Lock</code> 加锁之后不会自动释放锁，必须在 <code class="highlighter-rouge">finally</code> 块中释放锁。</strong></li>
+  <li>可定时的与可轮询的锁获取模式是由 <code class="highlighter-rouge">tryLock</code> 方法实现的，它具有更完善的错误恢复机制，可以用于：避免死锁的发生；实现具有时间限制的操作。</li>
+  <li><code class="highlighter-rouge">locklnterruptibly</code> 方法能够在获得锁的同时保持对中断的响应。</li>
+  <li>在 <code class="highlighter-rouge">ReentrantLock</code> 的构造函数中提供了<strong>两种公平性选择</strong>：非公平的锁（默认）或
+公平的锁。
+    <ul>
+      <li>在公平的锁上，线程将按照它们发出请求的顺序来获得锁。</li>
+      <li>非公平的锁上，则<strong>允许“插队”</strong>：当一个线程请求非公平的锁时，如果在发出请求的同时该锁的状态变为可用，那么这个线程将跳过队列中所有的等待线程并获得这个锁。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="公平性">公平性</h4>
+
+<ul>
+  <li><strong>公平性 VS 非公平性</strong>：公平性将由于在挂起线程和恢复线程时存在的开销而极大地降低性能。但在实际情况中，确保被阻塞的线程能最终获得锁（也就是<strong>非公平</strong>，或者说是<strong>统计上的公平保证</strong>）通常已经够用了，并且实际开销也小得多。</li>
+  <li>激烈竞争下，<strong>非公平锁的性能高于公平锁的性能的一个原因是</strong>：在恢复一个被挂
+起的线程与该线程真正开始运行之间存在着严重的延迟。</li>
+  <li><strong>应该优先使用 <code class="highlighter-rouge">synchronized</code></strong> ：使用内置锁，代码更加简洁紧凑，而且更不容易出错。所以应把 <code class="highlighter-rouge">ReentrantLock</code> 作为一种高级工具，在需要一些高级功能时才使用。</li>
+  <li><strong>互斥通常是一种过于强硬的加锁规则</strong>，虽然可以避免“写/写”冲突和“写/读”冲突，但同样也避免了“读/读”冲突。</li>
+</ul>
+
+<h4 id="读写锁">读/写锁</h4>
+
+<ul>
+  <li><strong>读/写锁</strong>：一个资源可以被多个读操作访问，或者被一个写操作访问，但两者不能同时进行。</li>
+  <li><strong>读/写锁 VS 互斥锁</strong>：对于在多处理器系统上被频繁读取的数据结构，读/写锁能够提高性能。而在其他情况下，读/写锁的性能比互斥锁的性能要略差一些：这是因为它们的复杂性更高。</li>
+  <li><code class="highlighter-rouge">ReadWriteLock</code> 中的一些可选实现：释放优先；读线程插队；重入性；降级；升级。</li>
+  <li><strong>在非公平的锁中</strong>，线程获得访问许可的顺序是不确定的。写线程降级为读线程是可以的，但<strong>从读线程升级为写线程则是不可以的</strong>（这样做会导致死锁）。</li>
+</ul>
+
+<h3 id="构建自定义的同步工具">构建自定义的同步工具</h3>
+
+<h4 id="状态依赖性的管理">状态依赖性的管理</h4>
+
+<ul>
+  <li>依赖状态的操作可以一直阻塞直到可以继续执行，这比使它们先失败再实现起来要更为方便且更不易出错。</li>
+  <li><strong>处理前提条件失败的方法</strong>
+    <ul>
+      <li><strong>将前提条件的失败传递给调用者</strong>：实现简单，但使用复杂，调用者必须做好捕获异常的准备。</li>
+      <li><strong>通过轮询和休眠来实现简单的阻塞</strong>：将前提条件的管理操作封装起来，使调用者无须在每次调用时都实现重试逻辑。但对调用者提出了一个新的需求：处理 <code class="highlighter-rouge">InterruptedException</code>。</li>
+      <li><strong>使用条件队列</strong>：使得一组线程（称之为等待线程集合）能够通过某种方式来等待特定的条件变成真。与使用“休眠”相比，条件队列并没有改变原来的语义。它只是在多个方面进行了优化：CPU效率、上下文切换开销和响应性等。</li>
+    </ul>
+  </li>
+  <li><strong>每个对象可以作为一个条件队列</strong>，并且 <code class="highlighter-rouge">Object</code> 中的 <code class="highlighter-rouge">wait</code>、<code class="highlighter-rouge">notify</code> 和 <code class="highlighter-rouge">notifyAII</code> 方法就构成了内部条件队列的 API。</li>
+  <li><code class="highlighter-rouge">Object.wait</code> 会<strong>自动释放锁</strong>，并请求操作系统挂起当前线程，从而使其他线程能够获得这个锁并修改对象韵状态。当被挂起的线程醒来时，它将在<strong>返回之前重新获取锁</strong>。</li>
+</ul>
+
+<h4 id="使用条件队列">使用条件队列</h4>
+
+<ul>
+  <li><strong>条件谓词</strong>：条件谓词是使某个操作成为状态依赖操作的前提条件。要想正确地使用条件队列，关键是找出对象在哪个条件谓词上等待。</li>
+  <li><strong>锁对象和条件队列对象必须是同一个对象。</strong></li>
+  <li><strong>每一次 <code class="highlighter-rouge">wait</code> 调用都会隐式地与特定的条件谓词关联起来。</strong>当调用某个特定条件谓词的 <code class="highlighter-rouge">wait</code> 时，调用者必须已经持有与条件队列相关的锁，并且这个锁必须保护着构成条件谓词的状态变量。</li>
+  <li><code class="highlighter-rouge">wait</code> 方法的返回并不一定意味着线程正在等待的条件谓词已经变成真了。所以，每当线程从 <code class="highlighter-rouge">wait</code> 中唤醒时，都<strong>必须再次测试条件谓词</strong>，如果条件谓词不为真，那么就继续等待（或者失败）。</li>
+  <li><strong>总结：当使用条件等待时</strong>（<code class="highlighter-rouge">Object.wait</code> 或 <code class="highlighter-rouge">Condition.await</code>）
+    <ul>
+      <li>通常都有一个条件谓词：包括一些对象状态的测试，线程在执行之前必须首先通过这些测试。</li>
+      <li>在调用 <code class="highlighter-rouge">wait</code> 之间测试条件谓词，并且从 <code class="highlighter-rouge">wait</code> 中返回时再次测试。</li>
+      <li>在一个循环中调用 <code class="highlighter-rouge">wait</code>。</li>
+      <li>确保使用与条件队列相关的锁来保护构成条件谓词的各个状态变量。</li>
+      <li>当调用 <code class="highlighter-rouge">wait</code>、<code class="highlighter-rouge">notify</code> 或 <code class="highlighter-rouge">notifyAll</code> 等方法时，一定要持有与条件队列相关的锁。</li>
+      <li>在检查条件谓词之后以及开始执行相应的操作之前，不要释放锁。</li>
+    </ul>
+  </li>
+  <li><strong>丢失的信号</strong>：线程必须等待一个已经为真的条件，但在开始等待之前没有检查条件谓词。</li>
+  <li><strong>通知</strong>：每当在等待一个条件时，一定要确保在条件谓词变成真时通过某种方式发出通知。
+    <ul>
+      <li><code class="highlighter-rouge">notify</code> ：从这个条件队列上等待的多个线程中选择一个来唤醒。</li>
+      <li><code class="highlighter-rouge">notifyAII</code> ：会唤醒所有在这个条件队列上等待的线程。</li>
+    </ul>
+  </li>
+  <li><strong>发出通知的线程应该尽快地释放锁</strong>：如果这些等待中线程此时不能重新获得锁，那么无法从 <code class="highlighter-rouge">wait</code> 返回，因此发出通知的线程应该尽快地释放锁，从而确保正在等待的线程尽可能快地解除阻塞。</li>
+  <li><strong>应该优先选择 <code class="highlighter-rouge">notifyAll</code> 而不是单个的 <code class="highlighter-rouge">notify</code></strong> ：单一的通知很容易导致类似于信号丢失的问题。
+    <ul>
+      <li>只有同时满足：所有等待线程的类型都相同（同个条件谓词）、单进单出这两个条件时，才应该使用 <code class="highlighter-rouge">notify</code>。</li>
+    </ul>
+  </li>
+  <li><strong>当只有一个线程可以执行时，如果使用 <code class="highlighter-rouge">notifyAll</code> ，那么将是低效的。</strong>调用 <code class="highlighter-rouge">notifyAll</code> 将唤醒每个线程，并使得它们在锁上发生竞争，然后，它们中的大多数或者全部又都回到休眠状态。</li>
+  <li><strong>条件通知（Conditional Notification）</strong>：仅当操作影响到状态转换时，才发出通知，这也被称为条件通知。条件通知可以提升性能，但很难实现。</li>
+  <li>在使用条件通知或单次通知时，一些<strong>约束条件使得子类化过程变得更加复杂</strong>。两个设计类时的解决方法是：
+    <ol>
+      <li>将其等待和通知等协议完全向子类公开（并且写入正式文档）：例如公开条件队列和锁、条件谓词和同步策略、一些底层的状态变量。</li>
+      <li>禁止子类化。</li>
+    </ol>
+  </li>
+  <li>通常，我们应该把条件队列封装起来，但这与“使用对象的内置锁来保护对象自身的状态”冲突。</li>
+  <li><strong>入口协议和出口协议（Entry and Exit Protocols）</strong>：描述 <code class="highlighter-rouge">wait</code> 和 <code class="highlighter-rouge">notify</code> 方法的正确使用。
+    <ul>
+      <li>入口协议就是该操作的条件谓词。</li>
+      <li>出口协议则包括，检查被该操作修改的所有状态变量，并确认它们是否使某个其他的条件谓词变为真，如果是，则通知相关的条件队列。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Condition</code> ：一种<strong>广义的</strong>内置条件队列。
+    <ul>
+      <li>内置条件队列存在一些缺陷，每个内置锁都只能有一个相关联的条件队列。</li>
+      <li><code class="highlighter-rouge">Condition</code> 更加灵活：在每个锁上可存在多个等待、条件等待可以是可中断的或不可中断的、基于时限的等待，以及公平的或非公平的队列操作。</li>
+      <li>创建一个 <code class="highlighter-rouge">Condition</code> ，可以在相关联的 <code class="highlighter-rouge">Lock</code> 上调用 <code class="highlighter-rouge">Lock.newCondition</code> 方法。</li>
+      <li>如果需要一些高级功能，那么应该优先使用 <code class="highlighter-rouge">Condition</code> 而不是内置条件队列。</li>
+    </ul>
+  </li>
+  <li><strong>AbstractQueuedSynchronizer(AQS)</strong> ：AQS 是一个用于构建锁和同步器的框架，许多同步器都可以通过 AQS 很容易并且高效地构造出来。
+    <ul>
+      <li>AQS 负责管理同步器类中的状态，它管理了一个整数状态信息，可以通过 <code class="highlighter-rouge">getState</code> ，<code class="highlighter-rouge">setState</code> 以及 <code class="highlighter-rouge">compareAndSetState</code> 等 <code class="highlighter-rouge">protected</code> 类型方法来进行操作。</li>
+      <li>提供了最基本的获取操作和释放操作，可选地支持独占或共享的获取操作。</li>
+      <li>提供了一些机制来构造与同步器相关联的条件变量。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="原子变量与非阻塞同步机制">原子变量与非阻塞同步机制</h3>
+
+<h4 id="硬件对并发的支持">硬件对并发的支持</h4>
+
+<ul>
+  <li>在针对多处理器操作而设计的处理器中提供了一些特殊指令，用于管理对共享数据的并发访问。例如：<strong>比较并交换（Compare-and-Swap，CAS）</strong>或者<strong>关联加载/条件存储（Load-Linked/Store-Conditional）</strong>。</li>
+  <li><strong>CAS 的含义</strong>是：“我认为 V 的值应该为 A，如果是，那么将V的值更新为 B，否则不修改并告诉 V 的值实际为多少”。</li>
+  <li>CAS 是一项乐观的技术，它希望能成功地执行更新操作，并且<strong>如果有另一个线程在最近一次检查后更新了该变量，那么 CAS 能检测到这个错误。并且，失败的线程不会挂起，而是被告知失败并可以重试</strong>。</li>
+  <li><strong>CAS 的典型使用模式</strong>是：首先从 V 中读取值 A，并根据 A 计算新值 B，然后再通过 CAS 以 C 子方式将 V 中的值由 A 变成 B（只要在这期间没有任何线程将v的值修改为其他值）。</li>
+  <li><strong>CAS VS 锁</strong>：当竞争程度不高时，基于 CAS 的同步器在性能上远远超过了基于锁的同步器，而在没有竞争时甚至更高。</li>
+</ul>
+
+<h4 id="原子变量类">原子变量类</h4>
+
+<ul>
+  <li><strong>原子变量</strong>
+    <ul>
+      <li>原子变量比锁的粒度更细，量级更轻，它将发生竞争的范围缩小到单个变量上。</li>
+      <li>更新原子变量的快速（非竞争）路径不会比获取锁的快速路径慢，并且通常会更快，而它的慢速路径肯定比锁的慢速路径快，因为它不需要挂起或重新调度线程。</li>
+      <li>能够支持原子的和有条件的读 - 改 - 写操作。</li>
+    </ul>
+  </li>
+  <li><strong>原子变量 VS 锁</strong>：在高度竞争的情况下，锁的性能将超过原子变量的性能，但<strong>在更真实的竞争情况下，原子变量的性能将超过锁的性能</strong>。</li>
+</ul>
+
+<h4 id="非阻塞算法">非阻塞算法</h4>
+
+<ul>
+  <li><strong>非阻塞算法</strong>：如果在某种算法中，一个线程的失败或挂起不会导致其他线程也失败或挂起，那么这种算法就被称为非阻塞算法。</li>
+  <li><strong>无锁（Lock-Free）算法</strong>：如果在算法的每个步骤中都存在某个线程能够执行下去，那么这种算法也被称为无锁算法。</li>
+  <li>非阻塞算法虽然实现复杂，但是能提升性能，而且通常不会出现死锁和优先级反转这些问题。</li>
+  <li><strong>创建非阻塞算法的关键</strong>在于，找出如何将原子修改的范围缩小到单个变量上，同时还要维护数据的一致性。</li>
+  <li><a href="http://jcip.net/listings/ConcurrentStack.java">使用 Treiber 算法构造非阻塞栈。</a></li>
+  <li><a href="http://jcip.net/listings/LinkedQueue.java">使用 Michael-Scott 算法构造非阻塞链表。</a></li>
+  <li><strong>ABA问题</strong>：在使用 CAS 时，如何确定“自从上次看到V的值为A以来，这个值是否发生了变化？”（如果在算法中采用自己的方式来管理节点对象的内存，那么就可能出现ABA问题）。</li>
+</ul>
+
+<h3 id="java-内存模型">Java 内存模型</h3>
+
+<h4 id="内存模型">内存模型</h4>
+
+<ul>
+  <li>各种各样的因素导致<strong>线程无法看到变量的最新值</strong>，所以从开发者的角度，如果没有进行同步处理，那么线程的内存操作看上去是以乱序执行。
+    <ul>
+      <li>在单线程中，JVM 能保证在线程中维护一种<strong>类似串行的语义</strong>：即会保证线程的执行结果与以严格串行模式执行的结果一致。</li>
+      <li>然而在多线程中，由于 JVM 维护这种串行语义将导致很大的开销，所以需要由开发者提供额外的同步操作来保证正确性。</li>
+    </ul>
+  </li>
+  <li><strong>JMM</strong>：JMM 规定了 JVM 必须遵循一组最小保证，这组保证规定了对变量的写入操作在何时将对于其他线程可见。</li>
+  <li>在不同的处理器架构中提供了不同级别的<strong>缓存一致性（Cache Coherence）</strong>，其中一部分只提供最小的保证，即允许不同的处理器在任意时刻从同一个存储位置上看到不同的值。</li>
+  <li><strong>串行一致性</strong>：程序执行一种简单假设：想象在程序中只存在唯一的操作执行顺序，而不考虑这些操作在何种处理器上执行，并且在每次读取变量时，都能获得在执行序列中（任何处理器）最近一次写入该变量的值。这种乐观的模型就被称为串行一致性。</li>
+  <li><strong>重排序</strong>：各种使操作延迟或者看似乱序执行的不同原因，都可以归为重排序。</li>
+  <li>同步将限制编译器、运行时和硬件对内存操作重排序的方式，从而在实施重排序时不会破坏 JMM 提供的可见性保证。</li>
+  <li><strong>Happens-Before</strong>：JMM 为程序中所有的操作定义了一个偏序关系，称之为 Happens-Before 。要想保证执行操作 B 的线程看到操作A的结果（无论A和B是否在同一个线程中执行），那么在A和B之间必须满足 Happens-Before 关系。</li>
+  <li><strong>借助（Piggyback）同步</strong> ：将 Happens-Before 的程序顺序规则与其他某个顺序规则结合起来，从而对某个未被锁保护的变量的访问操作进行排序。</li>
+  <li>借助同步容易出错，需要谨慎使用。</li>
+</ul>
+
+<h4 id="初始化的安全性">初始化的安全性</h4>
+
+<ul>
+  <li>
+    <p><strong>提前初始化（Eager Initialization）</strong></p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//完整代码：http://jcip.net/listings/EagerInitialization.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">EagerInitialization</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Resource</span> <span class="n">resource</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Resource</span><span class="o">();</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Resource</span> <span class="nf">getResource</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">resource</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Resource</span> <span class="o">{</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>不要使用<strong>双重检查加锁（DCL）</strong>，因为线程可能看到一个失效的状态值。</p>
+  </li>
+  <li>
+    <p><strong>初始化安全性</strong>将确保，对于对正确构造的对象，所有线程都能看到由构造函数为对象给各个 final 域设置的正确值，而不管采用何种方式来发布对象。而且，由某个 final 域到达的任意变量将同样对于其他线程是可见的。<strong>对于通过非 final 域可达的值，或者在构造过程完成之后可能改变的值，必须采用同步来确保可见性。</strong></p>
+  </li>
+</ul>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/02/11/java-concurrency-learning-3/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(三)">
+                        Previous<br>
+                        <span> Java 并发学习笔记(三)</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/02/26/jdk-reading-1/" data-toggle="tooltip" data-placement="top" title="JDK 源码阅读(一)：理解 ThreadLocal">
+                        Next<br>
+                        <span>JDK 源码阅读(一)：理解 ThreadLocal</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/02/13/java-concurrency-learning-4";
+    var disqus_url = "http://localhost:4000/2018/02/13/java-concurrency-learning-4/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

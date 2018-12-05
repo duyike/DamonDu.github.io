@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title> Java 并发学习笔记(二) - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2018/02/09/java-concurrency-learning-2/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/java-concurrency.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/java-concurrency.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.6);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#Concurrency" title="Concurrency">Concurrency</a>
+                        
+                    </div>
+                    <h1> Java 并发学习笔记(二)</h1>
+                    
+                    
+                    <h2 class="subheading">结构化并发应用程序</h2>
+                    
+                    <span class="meta">Posted by Damon To on February 9, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>这是我阅读<a href="https://book.douban.com/subject/10484692/">《 Java 并发编程实战》</a>整理出的知识大纲，第二部分主要是关于 Java 中如何使用 Executor 框架和线程池等技术来结构化地管理多线程应用程序。</p>
+</blockquote>
+
+<h3 id="before-reading">Before Reading</h3>
+
+<ol>
+  <li>本篇文章对应原书 6~9 章的内容。</li>
+  <li>建议通读过原书的对应内容后再使用这份知识大纲。</li>
+  <li>大部分内容为原书的摘抄，少部分是我自己的归纳。</li>
+  <li>文章中的代码是从原书 example 中摘抄得来，你可以从<a href="http://jcip.net/listings.html">原书官网</a>获取完整的代码。</li>
+</ol>
+
+<h3 id="任务执行">任务执行</h3>
+
+<ul>
+  <li><strong>服务器应用程序（典型的并发应用程序）设计的目标</strong>
+    <ul>
+      <li><strong>正常</strong>的负载下：应该能同时表现出<strong>良好的吞吐量和快速的响应性</strong>。</li>
+      <li>当<strong>负荷过载</strong>时：应用程序的<strong>性能应该是逐渐降低</strong>，而不是直接失败。</li>
+    </ul>
+  </li>
+  <li>要实现并发应用程序的设计目标，应该
+    <ul>
+      <li>选择清晰的<strong>任务边界</strong></li>
+      <li>选择明确的任务<strong>执行策略</strong></li>
+    </ul>
+  </li>
+  <li><strong>任务边界</strong>：大多数服务器应用程序都提供了一种自然的任务边界选择方式：<strong>以独立的客户请求为边界</strong>。</li>
+  <li><strong>执行策略</strong>
+    <ul>
+      <li><strong>串行执行</strong>：简单，性能糟糕（服务器资源利用率、吞吐量、响应性）</li>
+      <li><strong>显式地为任务创建线程</strong>：在正常负载下性能较好，但简单地为任务创建线程存在缺陷（尤其是线程数量大时）：线程生命周期的开销高、资源消耗高、稳定性差，导致在<strong>高负载时性能差</strong>（也即是可用性低）。</li>
+      <li><strong>使用</strong> <code class="highlighter-rouge">Executor</code> <strong>框架</strong>：基于<strong>生产者 — 消费者模式</strong>，提供了一种标准的方法将任务的提交过程与执行过程解耦开来，并用 <code class="highlighter-rouge">Runnable</code> 来表示任务；提供了对生命周期的支持，以及统计信息收集、应用程序管理机制和性能监视等机制。<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Executors.html">Executors</a> ；<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Executor.html">Executor</a> ；</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="使用-executor-框架">使用 Executor 框架</h4>
+
+<ul>
+  <li><strong>线程池</strong>：指管理一组同构工作线程的资源池。
+    <ul>
+      <li><strong>工作原理</strong>：由工作者线程（Worker Thread）从工作队列中获取一个任务，执行任务，然后返回线程池并等待下一个任务。</li>
+      <li><strong>使用线程池的好处</strong>：
+        <ol>
+          <li>通过重用现有的线程而不是创建新线程，减少线程创建和销毁线程产生的巨大开销。</li>
+          <li>当请求到达时，工作线程通常已经存在，因此不会由于等待创建线程而延迟任务的执行，提高了响应性。</li>
+          <li>基于线程池，应用程序的稳定性提高：在高负载时不会直接失败，而是平缓地降低性能。
+            <ul>
+              <li><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executors.html#newFixedThreadPool-int-java.util.concurrent.ThreadFactory-">newFixedThreadPool</a> / <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executors.html#newCachedThreadPool--">newCachedThreadPool</a> / <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executors.html#newSingleThreadExecutor--">newSingleThreadExecutor</a> / <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executors.html#newScheduledThreadPool-int-">newScheduledThreadPool</a></li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+  <li>使用 <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html">Interface ExecutorService</a> 管理 <code class="highlighter-rouge">Executor</code> 的生命周期
+    <ul>
+      <li>三种生命状态：运行、关闭、已终止。</li>
+      <li><code class="highlighter-rouge">shutdown</code> 方法执行平缓的关闭过程；<code class="highlighter-rouge">shutdownNow</code> 方法执行强制关闭过程。</li>
+      <li>在 <code class="highlighter-rouge">ExecutorService</code> 关闭后提交的任务将由<strong>“拒绝执行处理器（Rejected Execution Handler）”</strong>来处理。</li>
+      <li><code class="highlighter-rouge">awaitTermination</code> 等待 <code class="highlighter-rouge">ExecutorService</code> 到达终止状态；<code class="highlighter-rouge">isTerminated</code> 轮询 <code class="highlighter-rouge">ExecutorService</code> 是否已经终止。</li>
+    </ul>
+  </li>
+  <li>使用 <code class="highlighter-rouge">ScheduledThreadPoolExecutor</code> 创建延迟任务和周期任务。</li>
+</ul>
+
+<h4 id="进一步的分解任务以提高并行性">进一步的分解任务以提高并行性</h4>
+
+<ul>
+  <li>
+    <p><a href="http://blog.csdn.net/bboyfeiyu/article/details/24851847"><strong>区分 Runnable、Callable、Future、FutureTask</strong></a></p>
+
+    <ul>
+      <li>Executor 中包含了一些辅助方法能将其他类型的任务封装为一个 <code class="highlighter-rouge">Callable</code></li>
+      <li><code class="highlighter-rouge">Future</code> 表示一个任务的生命周期，并提供了相应的方法来判断是否已经完成或取消，以及获取任务的结果和取消任务等。<code class="highlighter-rouge">get</code> 方法的行为<strong>取决于任务的状态</strong>（尚未开始、正在运行、已完成）。如果任务已经完成，那么   <code class="highlighter-rouge">get</code> 会立即返回或者抛出一个 <code class="highlighter-rouge">Exception</code> ，如果任务没有完成，那么 <code class="highlighter-rouge">get</code> 将阻塞并直到任务完成。</li>
+    </ul>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 使用 Future 等待图片下载，实现异构任务（文字/图片）并行化
+ * 完整代码：http://jcip.net/listings/FutureRenderer.java
+ */</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">FutureRenderer</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ExecutorService</span> <span class="n">executor</span> <span class="o">=</span> <span class="n">Executors</span><span class="o">.</span><span class="na">newCachedThreadPool</span><span class="o">();</span>
+
+    <span class="kt">void</span> <span class="nf">renderPage</span><span class="o">(</span><span class="n">CharSequence</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">ImageInfo</span><span class="o">&gt;</span> <span class="n">imageInfos</span> <span class="o">=</span> <span class="n">scanForImageInfo</span><span class="o">(</span><span class="n">source</span><span class="o">);</span>
+        <span class="c1">//建立任务</span>
+        <span class="n">Callable</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;&gt;</span> <span class="n">task</span> <span class="o">=</span>
+                <span class="k">new</span> <span class="n">Callable</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+                    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;</span> <span class="nf">call</span><span class="o">()</span> <span class="o">{</span>
+                        <span class="n">List</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;();</span>
+                        <span class="k">for</span> <span class="o">(</span><span class="n">ImageInfo</span> <span class="n">imageInfo</span> <span class="o">:</span> <span class="n">imageInfos</span><span class="o">)</span>
+                            <span class="n">result</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">imageInfo</span><span class="o">.</span><span class="na">downloadImage</span><span class="o">());</span>
+                        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="o">};</span>
+	    <span class="c1">//将任务封装为 Future</span>
+        <span class="n">Future</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;&gt;</span> <span class="n">future</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="na">submit</span><span class="o">(</span><span class="n">task</span><span class="o">);</span>
+        <span class="n">renderText</span><span class="o">(</span><span class="n">source</span><span class="o">);</span>
+
+      	<span class="c1">//尝试 Future.get()</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">ImageData</span><span class="o">&gt;</span> <span class="n">imageData</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">ImageData</span> <span class="n">data</span> <span class="o">:</span> <span class="n">imageData</span><span class="o">)</span>
+                <span class="n">renderImage</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// 重新设置线程的中断状态</span>
+            <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+            <span class="c1">// 因为不需要结果，所以取消任务</span>
+            <span class="n">future</span><span class="o">.</span><span class="na">cancel</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ExecutionException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="nf">launderThrowable</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getCause</span><span class="o">());</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Future.get()</code> 拥有“状态依赖”的内在特性，因而<strong>调用者不需要知道任务的状态</strong>，此外在任务提交和获得结果中包含的安全发布属性也确保了<strong>这个方法是线程安全的</strong>。</p>
+  </li>
+  <li>
+    <p>使用<strong>完成服务（CompletionService）</strong>来在计算完成后获取结果：</p>
+
+    <ul>
+      <li><strong>工作原理</strong>：整合了 <code class="highlighter-rouge">Executor</code> 和 <code class="highlighter-rouge">BlockingQueue</code> 的功能，可以将 <code class="highlighter-rouge">Callable</code> 任务提交给它来执行，然后使用类似于队列操作的 <code class="highlighter-rouge">take</code> 和 <code class="highlighter-rouge">poll</code> 等方法来获得已完成的结果。</li>
+      <li><code class="highlighter-rouge">CompletionService</code> 可以<strong>从两个方面</strong>来<strong>提高页面渲染器的性能</strong>：<strong>缩短总运行时间</strong>：每个图片的下载从串行变为并行。<strong>提高响应性</strong>：图片在下载完成后立刻显示出来，能使用户获得一个更加动态和更高响应性的用户界面。</li>
+    </ul>
+  </li>
+  <li>
+    <p>为 <code class="highlighter-rouge">Future.get()</code> 方法设置时间限制可以实现<strong>为任务设定时限</strong>。</p>
+  </li>
+</ul>
+
+<h3 id="取消与关闭">取消与关闭</h3>
+
+<h4 id="任务取消">任务取消</h4>
+
+<ul>
+  <li>Java 没有提供任何机制来安全地终止线程，但它提供了<strong>中断（lnterruption）</strong>，这是一种协作机制，能够使一个线程终止另一个线程的当前工作。</li>
+  <li><strong>线程中断</strong>：
+    <ul>
+      <li>每个线程都有一个 <code class="highlighter-rouge">boolean</code> 类型的中断状态。当中断线程时，这个线程的中断状态将被设置为 <code class="highlighter-rouge">true</code>。</li>
+      <li><code class="highlighter-rouge">interrupt</code> 方法能中断目标线程。</li>
+      <li><code class="highlighter-rouge">islnterrupted</code> 方法能返回目标线程的中断状态。</li>
+      <li>静态的 <code class="highlighter-rouge">interrupted</code> 方法将清除当前线程的中断状态，并返回它之前的值，这也是<strong>清除中断状态的唯一方法。</strong></li>
+    </ul>
+  </li>
+  <li>中断操作<strong>并不会真正地中断</strong>一个正在运行的线程，而只是发出中断请求，然后由线程在下一个合适的时刻中断自己。（这些时刻也被称为取消点）</li>
+  <li>使用静态的 <code class="highlighter-rouge">interrupted</code> 时会清除当前线程的中断状态，除非你想屏蔽这个中断，否则必须对它进行处理。</li>
+  <li>通常，中断是实现取消的最合理方式。</li>
+  <li><strong>中断策略</strong>：中断策略规定线程如何解释某个中断请求。当发现中断请求时，应该做哪些工作（如果需要的话），哪些工作单元对于中断来说是原子操作，以及以多快的速度来响应中断。</li>
+  <li>最合理的中断策略是某种形式的<strong>线程级（Thread-Level）取消操作</strong>或<strong>服务级（Service-Level）取消操作</strong>：尽快退出，在必要时进行清理，通知某个所有者该线程已经退出。</li>
+</ul>
+
+<h4 id="停止一个基于线程的服务">停止一个基于线程的服务</h4>
+
+<ul>
+  <li>
+    <p>任务不会在其自己拥有的线程中执行，而是在某个服务（例如线程池）拥有的线程中执行。对于<strong>非线程所有者</strong>的代码来说，<strong>应该小心地保存中断状态</strong>，这样拥有线程的代码才能对中断做出响应。</p>
+  </li>
+  <li>
+    <p><strong>规则：若一个线程的中断策略是未知的，那么不可以中断该线程</strong>。</p>
+  </li>
+  <li>
+    <p>两种策略处理 <code class="highlighter-rouge">InterruptedException</code> ：传递异常和恢复中断状态。</p>
+  </li>
+  <li>
+    <p>对于<strong>不支持取消但仍可以调用可中断阻塞方法的操作</strong>：它们必须<strong>在循环中调用</strong>这些方法，并在发现中断后重新尝试。它们应该在本地保存中断状态，并在<strong>返回前</strong>（即 <code class="highlighter-rouge">finally</code> 中）恢复状态而不是在<strong>捕获 <code class="highlighter-rouge">InterruptedException</code> 时</strong>恢复状态。如果过早地设置中断状态，就可能引起无限循环。</p>
+  </li>
+  <li>
+    <p><strong>在外部线程中断</strong></p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/TimedRun1.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TimedRun1</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ScheduledExecutorService</span> <span class="n">cancelExec</span> <span class="o">=</span> <span class="n">Executors</span><span class="o">.</span><span class="na">newScheduledThreadPool</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">timedRun</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">r</span><span class="o">,</span> <span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="n">Thread</span> <span class="n">taskThread</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+        <span class="c1">// 创建一个 Runnable 来中断 taskThread</span>
+        <span class="n">cancelExec</span><span class="o">.</span><span class="na">schedule</span><span class="o">(</span><span class="k">new</span> <span class="n">Runnable</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+                <span class="n">taskThread</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">},</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">unit</span><span class="o">);</span>
+        <span class="n">r</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+
+    <ul>
+      <li>缺点：违反规则——若一个线程的中断策略是未知的，那么不可以中断该线程。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>在专门的线程中中断</strong></p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/TimedRun2.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TimedRun2</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ScheduledExecutorService</span> <span class="n">cancelExec</span> <span class="o">=</span> <span class="n">newScheduledThreadPool</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">timedRun</span><span class="o">(</span><span class="kd">final</span> <span class="n">Runnable</span> <span class="n">r</span><span class="o">,</span> <span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span>
+            <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+      	<span class="c1">// 为 Runnable 拓展中断策略</span>
+        <span class="kd">class</span> <span class="nc">RethrowableTask</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+            <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">Throwable</span> <span class="n">t</span><span class="o">;</span>
+
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="n">r</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">this</span><span class="o">.</span><span class="na">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+		   <span class="c1">// 实现了中断策略：若出现异常则再次抛出该异常</span>
+            <span class="kt">void</span> <span class="nf">rethrow</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">t</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                    <span class="k">throw</span> <span class="nf">launderThrowable</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+		<span class="c1">// 创建已知中断策略的线程</span>
+        <span class="n">RethrowableTask</span> <span class="n">task</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RethrowableTask</span><span class="o">();</span>
+        <span class="kd">final</span> <span class="n">Thread</span> <span class="n">taskThread</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="n">task</span><span class="o">);</span>
+        
+        <span class="n">taskThread</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+        <span class="n">cancelExec</span><span class="o">.</span><span class="na">schedule</span><span class="o">(</span><span class="k">new</span> <span class="n">Runnable</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+                <span class="n">taskThread</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">},</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">unit</span><span class="o">);</span>
+        <span class="c1">// join 等待并检查任务中是否抛出异常</span>
+        <span class="n">taskThread</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">unit</span><span class="o">.</span><span class="na">toMillis</span><span class="o">(</span><span class="n">timeout</span><span class="o">));</span>
+        <span class="n">task</span><span class="o">.</span><span class="na">rethrow</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+
+    <ul>
+      <li><a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Thread.html#join(long)">thread.join</a> 的不足是：无法知道执行控制是因为线程正常退出而返回还是因为 <code class="highlighter-rouge">join</code> 超时而返回。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>通过 <code class="highlighter-rouge">Future</code> 处理中断实现取消</strong></p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TimedRun</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ExecutorService</span> <span class="n">taskExec</span> <span class="o">=</span> <span class="n">Executors</span><span class="o">.</span><span class="na">newCachedThreadPool</span><span class="o">();</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">timedRun</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">r</span><span class="o">,</span> <span class="kt">long</span> <span class="n">timeout</span><span class="o">,</span> <span class="n">TimeUnit</span> <span class="n">unit</span><span class="o">)</span>
+            <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+        <span class="n">Future</span><span class="o">&lt;?&gt;</span> <span class="n">task</span> <span class="o">=</span> <span class="n">taskExec</span><span class="o">.</span><span class="na">submit</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">task</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">timeout</span><span class="o">,</span> <span class="n">unit</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">TimeoutException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// task will be cancelled below</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ExecutionException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// exception thrown in task; rethrow</span>
+            <span class="k">throw</span> <span class="nf">launderThrowable</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getCause</span><span class="o">());</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="c1">// Harmless if task already completed</span>
+            <span class="n">task</span><span class="o">.</span><span class="na">cancel</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span> <span class="c1">// interrupt if running</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>对于持有线程的服务，只要服务的存在时间大于创建线程的方法的存在时间，那么就应该提供生命周期方法。</p>
+  </li>
+  <li>
+    <p><strong>在日志服务中添加可靠的取消操作</strong></p>
+
+    <ul>
+      <li>日志服务本身是个生产者 — 消费者问题，所以取消日志服务时要考虑生产者线程和消费者线程的同步取消。</li>
+    </ul>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/LogService.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">LogService</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">BlockingQueue</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">queue</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">LoggerThread</span> <span class="n">loggerThread</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">PrintWriter</span> <span class="n">writer</span><span class="o">;</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">isShutdown</span><span class="o">;</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="kt">int</span> <span class="n">reservations</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">loggerThread</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">isShutdown</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">loggerThread</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+    <span class="o">}</span>
+	<span class="c1">// 生产者</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">log</span><span class="o">(</span><span class="n">String</span> <span class="n">msg</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+       	<span class="c1">// 内置锁同步</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">isShutdown</span><span class="o">)</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="cm">/*...*/</span><span class="o">);</span>
+            <span class="o">++</span><span class="n">reservations</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">queue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+    <span class="o">}</span>
+	<span class="c1">// 消费者</span>
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">LoggerThread</span> <span class="kd">extends</span> <span class="n">Thread</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">try</span> <span class="o">{</span>
+                      	<span class="c1">// 内置锁同步</span>
+                        <span class="kd">synchronized</span> <span class="o">(</span><span class="n">LogService</span><span class="o">.</span><span class="na">this</span><span class="o">)</span> <span class="o">{</span>
+                        	<span class="c1">// 被通知中断且没有需要处理的消息</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="n">isShutdown</span> <span class="o">&amp;&amp;</span> <span class="n">reservations</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+                                <span class="k">break</span><span class="o">;</span>
+                        <span class="o">}</span>
+                        <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="na">take</span><span class="o">();</span>
+                        <span class="kd">synchronized</span> <span class="o">(</span><span class="n">LogService</span><span class="o">.</span><span class="na">this</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="o">--</span><span class="n">reservations</span><span class="o">;</span>
+                        <span class="o">}</span>
+                        <span class="n">writer</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+                    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> <span class="cm">/* retry */</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                <span class="n">writer</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>毒丸（Poison Pill）对象</strong>：另一种关闭生产者 一 消费者服务的方式就是使用毒丸对象。毒丸是指一个放在队列上的对象，其含义是：<strong>当得到这个对象时，立即停止</strong>。</p>
+
+    <ul>
+      <li>毒丸对象将确保消费者在关闭之前首先完成队列中的所有工作；而生产者在提交了“毒丸”对象后，将不会再提交任何工作。</li>
+      <li>只有在生产者和消费者的数量都已知的情况下，才可以使用毒丸对象。</li>
+    </ul>
+  </li>
+  <li>
+    <p>实现跟踪<strong>被 <code class="highlighter-rouge">shutdownNow</code> 取消的正在执行</strong>的任务</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/TrackingExecutor.java</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="kd">final</span> <span class="n">Runnable</span> <span class="n">runnable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">exec</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="k">new</span> <span class="n">Runnable</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="n">runnable</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+                <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                  	<span class="c1">// 这里存在以一个竞态条件，但对于幂等任务来说不会导致正确性问题</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">isShutdown</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">isInterrupted</span><span class="o">())</span>
+                        <span class="n">tasksCancelledAtShutdown</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">runnable</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>并发程序中一些异常（如 <code class="highlighter-rouge">RuntimeException</code>）不会被捕捉到，要处理这些异常，一般通过结合“<strong>在工作者线程中主动捕捉异常”</strong>和<strong>“使用 <code class="highlighter-rouge">UncaughtExceptionHandler</code> ”</strong>这两种方法来实现。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">execute</code> 提交的任务抛出的异常才会交给 <code class="highlighter-rouge">UncaughtExceptionHandler</code> ，而 <code class="highlighter-rouge">submit </code>提交的任务则不会。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="jvm-关闭">JVM 关闭</h4>
+
+<ul>
+  <li>在<strong>正常关闭</strong>中，JVM 首先调用所有已注册的<strong>关闭钩子（Shutdown Hook）</strong>。当所有的关闭钩子都执行结束时，如果 <code class="highlighter-rouge">runFinalizersOnExit</code> 为 <code class="highlighter-rouge">true</code> ，那么 JVM 将运行<strong>终结器</strong>，然后再停止。</li>
+  <li><strong>关闭钩子</strong>：通过 <code class="highlighter-rouge">Runtime.addShutdownHook</code> 注册的但尚未开始的线程。
+    <ul>
+      <li>关闭钩子应该是线程安全的.</li>
+      <li>关闭钩子可以用于实现服务或应用程序的清理工作。</li>
+      <li>关闭钩子不应该依赖那些可能被应用程序或其他关闭钩子关闭的服务。</li>
+    </ul>
+  </li>
+  <li><strong>守护线程（Daemon Thread）</strong>
+    <ul>
+      <li>当希望创建一个线程来执行一些辅助工作，但又不希望这个线程阻碍 JVM的关闭，这种情况下就需要使用守护线程。</li>
+      <li>当创建一个新线程时，新线程将继承创建它的线程的守护状态，因此在默认情况下，主线程创建的所有线程都是普通线程。</li>
+      <li>普通线程与守护线程之间的<strong>差异仅在于当线程退出时发生的操作</strong>：当 JVM 停止时，所有仍然存在的守护线程都将被抛弃——既不会执行finally代码块，也不会执行回卷栈，而 JVM 只是直接退出。</li>
+      <li><strong>应尽可能少地使用守护线程</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>终结器</strong>
+    <ul>
+      <li>对于其他一些资源，例如文件句柄或套接字句柄，当不再需要它们时，必须<strong>显式地</strong>交还给操作系统。</li>
+      <li>在回收器释放它们后，调用它们的 <code class="highlighter-rouge">finalize</code> 方法，从而保证一些持久化的资源被释放。</li>
+      <li><strong>避免使用终结器</strong>。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="线程池的使用">线程池的使用</h3>
+
+<h4 id="任务和执行策略之间可能存在隐形耦合">任务和执行策略之间可能存在隐形耦合</h4>
+
+<ul>
+  <li>在使用任务执行框架时，由于在<strong>任务和执行策略之间可能存在隐形耦合</strong>，所以可能存在一些危险，主要考虑这几种任务：
+    <ul>
+      <li>依赖性任务。</li>
+      <li>使用线程封闭机制的任务。</li>
+      <li>对响应时间敏感的任务。</li>
+      <li>使用 <code class="highlighter-rouge">ThreadLocal</code> 的任务。</li>
+    </ul>
+  </li>
+  <li>如果任务依赖于其他任务，那么可能产生<strong>线程饥饿死锁（Thread Starvation Deadlock）</strong>，即任务需要无限期地等待一些必须由其他任务才能提供的资源或条件。
+    <ul>
+      <li>可以通过使用无界的线程池来解决。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="设置线程池的大小">设置线程池的大小</h4>
+
+<ul>
+  <li>
+    <p>通常不要固定线程池的大小，而应该通过某种配置机制来提供，或者根据 <code class="highlighter-rouge">Runtime.availableProcessors</code> 来动态计算。</p>
+  </li>
+  <li>
+    <p><strong>计算线程池的最优大小</strong></p>
+
+    <ul>
+      <li>对于 CPU 资源的限制</li>
+    </ul>
+
+    <p><img src="http://ompnv884d.bkt.clouddn.com/%E8%AE%A1%E7%AE%97%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E6%9C%80%E4%BC%98%E5%A4%A7%E5%B0%8F.png" alt="" /></p>
+
+    <ul>
+      <li>对于其他资源的限制：计算每个任务对该资源的需求量，然后用该资源的可用总量除以每个任务的需求量，所得结果就是线程池大小的上限。</li>
+      <li>线程池和资源池（如：数据连接池）的大小将会相互影响。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="使用-threadpoolexecutor">使用 ThreadPoolExecutor</h4>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">ThreadPoolExecutor</code> 是一个灵活的、稳定的线程池，允许各种定制。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">corePoolSize</code> ：<strong>基本大小</strong>，也就是线程池的目标大小，即在没有任务执行时线程池的大小，并且只有在工作队列满了的情况下才会创建超出这个数量的线程。</li>
+      <li><code class="highlighter-rouge">maximumPoolSize</code> ：<strong>最大大小</strong>，可同时活动的线程数量的上限。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>队列任务</strong>：如果新请求的到达速率超过了线程池的处理速率，那么新到来的请求将累积起来。在线程池中，这些请求会在一个由 <code class="highlighter-rouge">Executor</code> 管理的 <code class="highlighter-rouge">Runnable</code> 队列中等待，不会竞争CPU资源。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">ThreadPooIExecutor</code> 允许提供一个 <code class="highlighter-rouge">BlockingQueue</code> 来保存等待执行的任务，基本的任务排队方法有3种：<strong>无界队列、有界队列和同步移交（Synchronous Handoff）</strong>。</p>
+  </li>
+  <li>
+    <p>对于有界队列，如果<strong>线程池较小而队列较大</strong>，那么有助于减少内存使用量，降低 CPU 的使用率，同时还可以减少上下文切换，但付出的代价是可能会限制吞吐量。</p>
+  </li>
+  <li>
+    <p>通过使用 <code class="highlighter-rouge">SynchronousQueue</code> ，可以<strong>避免任务排队</strong>，以及直接将任务从生产者移交给工作者线程。<code class="highlighter-rouge">SynchronousQueue</code> <strong>不是一个真正的队列</strong>，而是一种在线程之间进行移交的机制。</p>
+  </li>
+  <li>
+    <p><strong>饱和策略</strong>：当有界队列被填满后，饱和策略开始发挥作用。 <code class="highlighter-rouge">ThreadPooIExecutor</code> 的饱和策略可以通过调用 <code class="highlighter-rouge">setRejectedExecutionHandler</code> 来修改。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">AbortPolicy</code>：中止，默认的饱和策略，抛出未检查的 <code class="highlighter-rouge">RejectedExecutionException</code> 。</li>
+      <li><code class="highlighter-rouge">DiscardPolicy</code>：抛弃，且不抛出异常。</li>
+      <li><code class="highlighter-rouge">DiscardOldestPolicy</code>：抛弃最旧，且不抛出异常。</li>
+      <li><code class="highlighter-rouge">CallerRunsPolicy</code>：调用者运行，不会抛弃任务，也不会抛出异常，而是将某些任务回退到调用者，从而降低新任务的流量。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>使用调用者运行策略的优点</strong>：当服务器过载，这种过载情况会逐渐<strong>向外蔓延</strong>开来——从线程池到工作队列到应用程序再到TCP层，最终达到客户端，导致服务器在高负载下<strong>实现一种平缓的性能降低</strong>。</p>
+  </li>
+  <li>
+    <p>通过指定一个线程工厂方法，可以定制线程池的配置信息。</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/MyThreadFactory.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyThreadFactory</span> <span class="kd">implements</span> <span class="n">ThreadFactory</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">poolName</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">MyThreadFactory</span><span class="o">(</span><span class="n">String</span> <span class="n">poolName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">poolName</span> <span class="o">=</span> <span class="n">poolName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Thread</span> <span class="nf">newThread</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">runnable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">MyAppThread</span><span class="o">(</span><span class="n">runnable</span><span class="o">,</span> <span class="n">poolName</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>在调用完 <code class="highlighter-rouge">ThreadPooIExecutor</code> 的构造函数后，仍然可以通过<strong>设置函数（Setter）</strong>来修改大多数传递给它的构造函数的参数。</p>
+
+    <ul>
+      <li>使用 <code class="highlighter-rouge">unconfigurableExecutorService</code> 来包装可以防止通过 Setter 修改。</li>
+    </ul>
+  </li>
+  <li>
+    <p>通过改写 <code class="highlighter-rouge">beforeExecute</code> 和 <code class="highlighter-rouge">afterExecute</code> 方法，可以添加日志、计时、监视或统计信息收集的功能；改写 <code class="highlighter-rouge">terminated</code> 可以用来释放 <code class="highlighter-rouge">Executor</code> 在其生命周期里分配的各种资源，以及实现执行发送通知、记录日志或者收集finalize统计信息等操作。</p>
+  </li>
+</ul>
+
+<h4 id="迭代算法的并行化">迭代算法的并行化</h4>
+
+<ul>
+  <li>
+    <p><strong>迭代并行化的条件</strong>：在循环体中，每一次迭代是独立的；更进一步，只有当每个迭代操作执行的工作量大于管理一个新线程的开销，并行化才有意义。</p>
+  </li>
+  <li>
+    <p><strong>谜题框架</strong></p>
+
+    <ul>
+      <li>“谜题”<strong>定义</strong>为：包含了一个初始位置，一个目标位置，以及用于判断是否是有效移动的规则集。</li>
+      <li>并发的谜题解答器：</li>
+    </ul>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/ConcurrentPuzzleSolver.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ConcurrentPuzzleSolver</span> <span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Puzzle</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;</span> <span class="n">puzzle</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ExecutorService</span> <span class="n">exec</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ConcurrentMap</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">&gt;</span> <span class="n">seen</span><span class="o">;</span>
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">ValueLatch</span><span class="o">&lt;</span><span class="n">PuzzleNode</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;&gt;</span> <span class="n">solution</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ValueLatch</span><span class="o">&lt;</span><span class="n">PuzzleNode</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;&gt;();</span>
+      
+    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;</span> <span class="nf">solve</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">P</span> <span class="n">p</span> <span class="o">=</span> <span class="n">puzzle</span><span class="o">.</span><span class="na">initialPosition</span><span class="o">();</span>
+            <span class="n">exec</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">newTask</span><span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">));</span>
+            <span class="c1">// 阻塞直到找到解答</span>
+            <span class="n">PuzzleNode</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;</span> <span class="n">solnPuzzleNode</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+            <span class="k">return</span> <span class="o">(</span><span class="n">solnPuzzleNode</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span> <span class="n">solnPuzzleNode</span><span class="o">.</span><span class="na">asMoveList</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">exec</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="n">Runnable</span> <span class="nf">newTask</span><span class="o">(</span><span class="n">P</span> <span class="n">p</span><span class="o">,</span> <span class="n">M</span> <span class="n">m</span><span class="o">,</span> <span class="n">PuzzleNode</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">SolverTask</span><span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="n">m</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">protected</span> <span class="kd">class</span> <span class="nc">SolverTask</span> <span class="kd">extends</span> <span class="n">PuzzleNode</span><span class="o">&lt;</span><span class="n">P</span><span class="o">,</span> <span class="n">M</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">solution</span><span class="o">.</span><span class="na">isSet</span><span class="o">()</span>
+                    <span class="o">||</span> <span class="n">seen</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">pos</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                <span class="k">return</span><span class="o">;</span> <span class="c1">// 找到解答或者已完全遍历</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">puzzle</span><span class="o">.</span><span class="na">isGoal</span><span class="o">(</span><span class="n">pos</span><span class="o">))</span>
+                <span class="n">solution</span><span class="o">.</span><span class="na">setValue</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+            <span class="k">else</span>
+                <span class="nf">for</span> <span class="o">(</span><span class="n">M</span> <span class="n">m</span> <span class="o">:</span> <span class="n">puzzle</span><span class="o">.</span><span class="na">legalMoves</span><span class="o">(</span><span class="n">pos</span><span class="o">))</span>
+                    <span class="n">exec</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">newTask</span><span class="o">(</span><span class="n">puzzle</span><span class="o">.</span><span class="na">move</span><span class="o">(</span><span class="n">pos</span><span class="o">,</span> <span class="n">m</span><span class="o">),</span> <span class="n">m</span><span class="o">,</span> <span class="k">this</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+
+    <ul>
+      <li>使用闭锁，可以检测是否有线程已经找到一个解答。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="用户图形界面应用程序">用户图形界面应用程序</h3>
+
+<ul>
+  <li><strong>GUI 是单线程的原因</strong>：多线程的 GUI 容易发生死锁问题。
+    <ol>
+      <li>多线程下，输入事件的处理过程（气泡上升）与GUI组件的面向对象模型（气泡下降）之间会存在错误的交互。</li>
+      <li>MVC 设计模式进一步增加了出现不一致锁定顺序的风险。</li>
+    </ol>
+  </li>
+  <li>单线程的 GUI 框架通过<strong>线程封闭机制</strong>来实现线程安全性。</li>
+</ul>
+
+<h4 id="处理-gui-任务">处理 GUI 任务</h4>
+
+<ul>
+  <li>对于<strong>短时间且只访问 GUI 对象</strong>的 GUI 任务，基本上所有操作都可以直接在事件线程中进行。</li>
+  <li>对于<strong>长时间以及复杂</strong>的 GUI 任务，这些任务必须在另外的线程中运行以保存 GUI 的高响应性。同时，可能还有一些另外的实现需求，例如：
+    <ol>
+      <li><a href="http://jcip.net/listings/ListenerExamples.java">取消任务</a></li>
+      <li><a href="http://jcip.net/listings/BackgroundTask.java">进度标识、完成标识</a></li>
+    </ol>
+  </li>
+</ul>
+
+<h4 id="共享数据模型">共享数据模型</h4>
+
+<ul>
+  <li>简单情况下，其他线程无法访问数据模型，GUI 应用程序只需简单地静态加载数据模型；但在一些情况下，数据在 GUI 程序进出时由多个线程共享。这种情况下，有两种解决数据同步性的方法：
+    <ol>
+      <li>实现线程安全的数据模型：但要构建一个既能提供高效的并发访问又能在旧数据无效后不再维护它们的数据结构却并不容易。</li>
+      <li>采用<strong>分解数据模型的设计模式</strong>。</li>
+    </ol>
+  </li>
+  <li>分解模型的设计模式中，<strong>表现模型</strong>被封闭在事件线程中，而其他模型，即<strong>共享模型</strong>，是线程安全的。
+    <ul>
+      <li><strong>表现模型可以在共享模型中得到更新</strong>：通过将相关状态的快照嵌入到更新消息中，或者由表现模型在收到更新事件时直接从共享模型中获取数据。</li>
+      <li>通过快照实现更新，虽然简单，但是当数据模型很大或更新频率高时效率低下。采取<strong>增量更新</strong>可以解决这个问题。并且，增量更新还能带来细粒度的变化信息，从而<strong>优化 GUI 的视觉效果</strong>。</li>
+    </ul>
+  </li>
+  <li>当某个工具必须被实现为单线程子系统是，可以借鉴 GUI 的实现，采取线程封闭来实现。</li>
+</ul>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/02/06/java-concurrency-learning-1/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(一)">
+                        Previous<br>
+                        <span> Java 并发学习笔记(一)</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/02/11/java-concurrency-learning-3/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(三)">
+                        Next<br>
+                        <span> Java 并发学习笔记(三)</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/02/09/java-concurrency-learning-2";
+    var disqus_url = "http://localhost:4000/2018/02/09/java-concurrency-learning-2/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

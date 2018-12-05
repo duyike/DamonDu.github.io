@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>深入理解Java虚拟机(二) - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2017/12/18/java-virtual-machine-2/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/java-virtual-machine.jpeg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/java-virtual-machine.jpeg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.5);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                    </div>
+                    <h1>深入理解Java虚拟机(二)</h1>
+                    
+                    
+                    <h2 class="subheading">虚拟机执行子系统</h2>
+                    
+                    <span class="meta">Posted by Damon To on December 18, 2017</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>最近在看周志明版的《深入理解 Java 虚拟机》一书，觉得写得很好，十分适合 Java 学习者作为进阶学习的指导书籍。这是我在阅读这本书和进行知识复盘的时候整理出的知识大纲式的文档，第二部分主要关于 Java 虚拟机执行子系统。</p>
+</blockquote>
+
+<h3 id="before-reading">Before Reading</h3>
+
+<ol>
+  <li>本篇文章对应原书 6~8 章的内容。</li>
+  <li>建议通读过原书的对应内容后再使用这份知识大纲。</li>
+  <li>大部分内容为原书的摘抄，少部分是我自己的归纳。</li>
+</ol>
+
+<h3 id="一-类文件结构">(一) 类文件结构</h3>
+
+<ul>
+  <li><strong>Class 文件格式</strong></li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>类型</th>
+      <th>名称</th>
+      <th>数量</th>
+      <th>含义/作用</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>u4</td>
+      <td>magic</td>
+      <td>1</td>
+      <td>魔数；确定该文件是否为一个能被虚拟机接受的 Class 文件</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>minor_version</td>
+      <td>1</td>
+      <td>次版本号</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>major_version</td>
+      <td>1</td>
+      <td>主版本号</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>constant_pool_count</td>
+      <td>1</td>
+      <td>常量池容量计数值</td>
+    </tr>
+    <tr>
+      <td>cp_info</td>
+      <td>constant_pool</td>
+      <td>constant_pool_count-1</td>
+      <td>常量池；存放字面量与符号引用（从1开始计数）</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>access_flags</td>
+      <td>1</td>
+      <td>访问标识；用于识别一些类或接口层次的访问信息</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>this_class</td>
+      <td>1</td>
+      <td>类索引；确定该类的全限定名</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>super_class</td>
+      <td>1</td>
+      <td>父类索引；确定该类的父类的全限定名</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>interfaces_count</td>
+      <td>1</td>
+      <td>接口计数器</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>interfaces</td>
+      <td>interfaces_count</td>
+      <td>接口集合；描述该类实现了哪些接口</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>fields_count</td>
+      <td>1</td>
+      <td>字段计数器</td>
+    </tr>
+    <tr>
+      <td>field_info</td>
+      <td>fields</td>
+      <td>fields_count</td>
+      <td>字段表；描述接口或类中声明的变量</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>methods_count</td>
+      <td>1</td>
+      <td>方法计数器</td>
+    </tr>
+    <tr>
+      <td>method_info</td>
+      <td>methods</td>
+      <td>methods_count</td>
+      <td>方法表；描述接口或类中的方法</td>
+    </tr>
+    <tr>
+      <td>u2</td>
+      <td>attributes_count</td>
+      <td>1</td>
+      <td>属性计数器</td>
+    </tr>
+    <tr>
+      <td>attribute_info</td>
+      <td>attributes</td>
+      <td>attributes_count</td>
+      <td>属性表；描述某些场景下专有的信息</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Class 文件每个字节代表什么含义，长度是多少，先后顺序如何，都是固定不能改变的。</li>
+  <li>常量池中主要存放两类常量：<strong>字面量（Literal）</strong>和<strong>符号引用（Symbolic References）</strong>：
+    <ul>
+      <li>字面量如：文本字符串、声明为 final 的常量值等</li>
+      <li>符号引用如：1. 类和接口的全限定名；2. 字段的名称和描述符；3. 方法的名称和描述符</li>
+    </ul>
+  </li>
+  <li>字段（field）包括类级变量以及实例级变量，不包括方法内部声明的局部变量</li>
+  <li><strong>区分：简单名称/描述符/全限定名</strong>
+    <ul>
+      <li>简单名称：没有类型和参数修饰的方法或者字段名称</li>
+      <li>描述符：描述字段的数据类型、方法的参数列表和返回值（例：”[[Ljava/lang/String”）</li>
+      <li>全限定名：例”java/lang/String”</li>
+    </ul>
+  </li>
+  <li>字段表（方法表）集合中不会列出继承而来的字段（方法），但会有编译器自动添加的源码中不存在的字段（方法）</li>
+  <li><strong>Java 语言中</strong>，重载的要求是：简单名称相同，特征签名不同，所以不能存在简单名称与特征签名都相同的两个方法；而<strong>在 Class 文件中</strong>，只要是描述符不完全相同的两个方法便可以共存（即允许存在简单名称与特征签名都相同的两个方法，返回值不同的两个方法）</li>
+  <li>javac 编译器使用异常表而不是简单的跳转命令来实现 Java 异常和 finally 处理机制</li>
+  <li><strong>区分 Exceptions 属性与异常表：</strong>
+    <ul>
+      <li>Exceptions 属性与 Code 属性平级，作用是列举出方法中可能抛出的受查异常（Checked Exceptions）</li>
+      <li>异常表属于 Code 属性，作用是实现 Java 异常和 finally 处理机制</li>
+    </ul>
+  </li>
+  <li>Signature 属性，用于存储一个方法在字节码层面的特征签名。这个属性保存的不是原生类型，而是参数化类型的信息，是通过反射取得参数化类型的根本依据</li>
+  <li>BootstrapMethods 属性，用于保存 invokedynamic 指令引用的引导方法限定符</li>
+  <li>在 Java 虚拟机指令集中，大多数指令都包含了其操作所对应的数据类型信息</li>
+  <li>Java 编译器会在将 byte 和 short 型数据带符号扩展，将 boolean 和 char 类型数据零位扩展成对应的 int 类型数据</li>
+  <li><strong>Java 类型转化</strong>
+    <ul>
+      <li>宽化类型转化（Widening Numeric Conversations）：小范围想大范围类型的转化，安全，虚拟机直接支持</li>
+      <li>窄化类型转化（Narrowing  Numeric Conversations）：必须显式地使用转化指令</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="二-虚拟机类加载机制">(二) 虚拟机类加载机制</h3>
+
+<ul>
+  <li><strong>虚拟机类加载机制：</strong>虚拟机把描述类的数据从 Class 文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的 Java 类型</li>
+  <li><strong>类的生命周期：</strong>加载（Loading）、验证（Verification）、准备（Preparation）、解析（Resolution）、初始化（Initialization）、使用（Using）和卸载（Unloading）；其中，验证/准备/解析这 3 个步骤也可以统称为连接（Linking）</li>
+  <li><strong>有且只有</strong> 5 种情况（<strong>主动引用</strong>）需要立即对类进行初始化：
+    <ol>
+      <li>遇到 new/getstatic/putstatic/invokestatic 时</li>
+      <li>使用 java.lang.reflect 包的方法对类进行反射调用时</li>
+      <li>当初始化一个类的时候，发现其父类还没有进行过初始化，则先要对父类进行初始化</li>
+      <li>当虚拟机启动时，初始化主类</li>
+      <li>如果一个 java.lang.invoke.MethodHandle 实例最后解析结果是 REF_getStatic / REF_putStatic / REF_invokeStatic 的方法句柄，且句柄对应的类没有进行过初始化时</li>
+    </ol>
+  </li>
+  <li><strong>被动引用</strong>不会触发初始化，它包括：
+    <ol>
+      <li>通过子类引用父类的静态字段，不会导致子类初始化</li>
+      <li>通过数组定义来引用类，不会触发此类的初始化</li>
+      <li>常量在编译阶段会存入调用类的常量池中（常量传播优化），本质上并没有直接引用到定义常量的类，不会触发定义常量的类的初始化</li>
+    </ol>
+  </li>
+  <li>接口加载与类加载的不同：第 3 种主动引用，<strong>接口初始化时，不要求其父接口全部都完成了初始化</strong></li>
+  <li><strong>区分类加载/加载：</strong>类加载包含：加载、验证、准备、解析、初始化 5 个步骤；加载是类加载的一个阶段</li>
+  <li><strong>加载阶段</strong>，虚拟机需要完成 3 件事：
+    <ol>
+      <li>通过类的全限定名来获取定义类的二进制字节流</li>
+      <li>将字节流所代表的静态存储结构转化为方法区的运行时数据结构</li>
+      <li>在内存中生成类的 java,lang.Class 对象，作为方法区这个类的各种数据的访问入口</li>
+    </ol>
+  </li>
+  <li><strong>非数组类的加载</strong>，可以使用系统提供的引导类加载器来完成，也可以用用户自定义的类加载器完成；<strong>数组类的加载</strong>，由 Java 虚拟机直接创建</li>
+  <li><strong>元素类型（Element Type）VS 组件类型（Component Type）</strong>
+    <ul>
+      <li>元素类型：数组去掉所有维度的类型</li>
+      <li>组件类型：数组去掉一个维度的类型</li>
+    </ul>
+  </li>
+  <li><strong>验证阶段</strong>的 4 个阶段的检验动作：
+    <ol>
+      <li>文件格式验证：字节流是否符合 Class 文件格式？版本兼容？</li>
+      <li>元数据验证：对类的元数据进行语义校验（语义分析）</li>
+      <li>字节码验证：数据流和控制流分析（语义分析）</li>
+      <li>符号引用验证：确保符号引用的解析动作能正常执行</li>
+    </ol>
+  </li>
+  <li><strong>区分：准备阶段/初始化阶段</strong>
+    <ul>
+      <li>准备阶段为类变量分配内存并设置类变量初始值，这里的初始值一般是数据类型的零值（常量字段设置为 ConstantValue 属性设置的值）</li>
+      <li>初始化阶段则根据程序员通过程序指定的计划去初始化类变量和其他资源</li>
+    </ul>
+  </li>
+  <li><strong>解析阶段</strong>将常量池内的符号引用替换为直接引用</li>
+  <li><strong>符号引用（Symbolic References）VS 直接引用（Direct References）</strong>
+    <ul>
+      <li>符号引用用一组符号来描述所引用的墓表，符号可以是任何形式的字面量，与虚拟机实现的内存布局无关</li>
+      <li>直接变量可以是直接指向目标的指针、相对偏移量或是一个能间接定位到目标的句柄，和虚拟机实现的内存布局有关</li>
+    </ul>
+  </li>
+  <li>虚拟机可以对一次解析的结果进行缓存以避免解析动作重复进行</li>
+  <li><strong>初始化阶段</strong>执行类构造器 &lt;clinit&gt;() 方法。关于 &lt;clinit&gt;() 方法：
+    <ul>
+      <li>&lt;clinit&gt;() 方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块中的语句合并产生</li>
+      <li>虚拟机会保证调用子类 &lt;clinit&gt;() 方法时父类的 &lt;clinit&gt;() 方法已经执行完毕</li>
+      <li>执行接口的 &lt;clinit&gt;() 方法不需要先执行其父接口的 &lt;clinit&gt;() 方法</li>
+      <li>如果一个类中没有类变量的赋值动作和静态语句块，则编译器可以不生成 &lt;clinit&gt;() 方法</li>
+      <li>虚拟机保证类的 &lt;clinit&gt;() 方法在多线程环境下被正确地加锁、同步</li>
+    </ul>
+  </li>
+  <li>静态语句块只能访问定义在静态语句块之前的变量，定义在它之后的变量在静态语句块中<strong>只能赋值不能访问</strong></li>
+  <li><strong>类加载器：</strong>类加载阶段中，“通过一个类的全限定名来获取描述此类的二进制字节流”这个动作是在 Java 虚拟机外部实现的，这个实现模块叫做“类加载器”</li>
+  <li>两个来自同一 Class 文件被不同的类加载器加载，则两个类不相等</li>
+  <li>类加载器一般分三种：
+    <ul>
+      <li>启动类加载器（Bootstrap ClassLoader）：加载其他的所有类加载器</li>
+      <li>扩展类加载其（Extension ClassLoader）：加载 &lt;JAVA_HOME&gt;\lib\ext 中的，或者被 java.ext.dirs 指定的路径中的所有类库</li>
+      <li>应用程序类加载器（Application ClassLoader）：架子用户类路径上所指定的类库</li>
+    </ul>
+  </li>
+  <li><strong>双亲委派模型（Parents Delegation Model）：</strong>除了顶层的启动类加载器外，其余的类加载器都应当有自己的父类加载器。
+    <ul>
+      <li>这里的父子关系不是以继承（Inheritance）实现而是使用组合（Composition）来复用父加载器的代码</li>
+      <li>只有当父加载器无法完成加载请求时，子加载器才会尝试自己加载（优先级：父加载器 &gt; 子加载器）</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="三-虚拟机字节码执行引擎">(三) 虚拟机字节码执行引擎</h3>
+
+<ul>
+  <li>
+    <p><strong>当前栈帧（Current Stack Frame）：</strong>对于执行引擎来说，在活动线程中，只有位于栈顶的栈帧才是有效的，称为当前栈帧。这个栈帧关联的方法称为<strong>当前方法（Current Method）</strong></p>
+  </li>
+  <li>
+    <p><strong>操作数栈（Operand Stack）：</strong>也称操作栈，用于进行算术运算或方法参数传递，它是一个后入先出栈（LIFO）。操作数栈中元素的数据类型必须与字节码指令的序列严格匹配。</p>
+  </li>
+  <li>
+    <p>大多数虚拟机的实现中，会令两个栈帧出现一部分重叠，以减少参数复制传递。</p>
+  </li>
+  <li>
+    <p><strong>正常完成出口（Normal Method Invocation Completion）：</strong>返回地址是调用者的 PC 计数器的值，这个值存储在栈帧中；<strong>异常完成出口（Abrupt Method Invocation Completion）：</strong>返回地址要通过异常处理器来确定，不存储在栈帧</p>
+  </li>
+  <li>
+    <p><strong>解析（Resolution）</strong></p>
+
+    <ul>
+      <li>前提：“编译器可知，运行期不可变”</li>
+      <li>符合条件的有：静态方法、私有方法、实例构造器、父类方法（统称为非虚方法）、被 final 修饰的方法</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>静态类型（Static Type） VS 实际类型（Actual Type）</strong></p>
+
+    <ul>
+      <li>变量本身的静态类型不会改变，且是编译期可知的</li>
+      <li>实际类型则在运行期才能确定</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>分派（Dispatch）</strong></p>
+
+    <ul>
+      <li>静态分派：依赖静态类型来定位方法执行版本的分派动作称为静态分派。典型应用是方法重载，重载版本并不是“唯一的”，往往只能确定一个“更合适的”版本</li>
+      <li>动态分派：依赖实际类型来定位方法执行版本的分派动作。典型应用是重写。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>invokevirtual 指令的运行时解析过程：</strong></p>
+
+    <p><img src="http://ompnv884d.bkt.clouddn.com/invokevirtual%20%E6%8C%87%E4%BB%A4%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B.png" alt="invokevirtual 指令的运行时解析过程" /></p>
+  </li>
+  <li>
+    <p><strong>单分派/多分派：</strong>方法的接收者与方法的参数统称为方法的宗量。单分派根据一个宗量对目标方法进行选择，多分派根据多个宗量对目标方法进行选择</p>
+  </li>
+  <li>
+    <p>直到目前，Java 是<strong>“静态多分派，动态单分派”</strong></p>
+  </li>
+  <li>
+    <p><strong>虚拟机动态分派的实现：</strong>类在方法区建立一个虚方法表（Virtual Method Table）或接口方法表（Interface Method Table），表中存放这各个方法的实际入口地址，如果某个方法在子类没有被重写，则表中该方法的地址与父类的一致</p>
+  </li>
+  <li>
+    <p>解析与分派并不是二选一的排他关系，而是在不同层次上筛选、确定目标方法的过程</p>
+  </li>
+  <li>
+    <p>Java 中实现动态类型语言：1.invokedynamic 指令；2. java.lang.invoke 包</p>
+  </li>
+  <li>
+    <p>java.lang.invoke 包提供了除了依靠符号引用来确定调用目标方法以外的另外一种动态确定目标方法的机制，称为 <strong>MethodHandle</strong>。这种机制主要是通过<strong>模拟字节码层面的方法调用</strong>来实现的，所以可以服务于所有运行与 Java 虚拟机之上的语言。</p>
+  </li>
+  <li>
+    <p><strong>基于栈的指令集 VS 基于寄存器的指令集：</strong>基于栈的指令集的优点是可移植，代码更加紧凑，编译器实现更简单；缺点是执行速度较慢，指令数量较多</p>
+  </li>
+</ul>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/12/14/java-virtual-machine-1/" data-toggle="tooltip" data-placement="top" title="深入理解Java虚拟机(一)">
+                        Previous<br>
+                        <span>深入理解Java虚拟机(一)</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2017/12/19/java-virtual-machine-3/" data-toggle="tooltip" data-placement="top" title="深入理解Java虚拟机(三)">
+                        Next<br>
+                        <span>深入理解Java虚拟机(三)</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2017/12/18/java-virtual-machine-2";
+    var disqus_url = "http://localhost:4000/2017/12/18/java-virtual-machine-2/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

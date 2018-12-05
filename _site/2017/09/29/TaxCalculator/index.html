@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Java Web 开发(一)：简易税务计算器 - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2017/09/29/TaxCalculator/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/TaxCalculator.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/TaxCalculator.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.5);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#Java Web" title="Java Web">Java Web</a>
+                        
+                        <a class="tag" href="/tags/#Javascript" title="Javascript">Javascript</a>
+                        
+                    </div>
+                    <h1>Java Web 开发(一)：简易税务计算器</h1>
+                    
+                    
+                    <h2 class="subheading">—— 基于 Java + JS 实现</h2>
+                    
+                    <span class="meta">Posted by Damon To on September 29, 2017</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>2018.03.02更新：本项目实现了一个简单的税务计算器，而核心上则是实现了一个极其简单甚至简陋的 Http Server。在学习了 JVM，Java concurrent 这些基础知识并且了解了一些框架技术后，回过头来看几个月前做的这个项目，就会觉得当时的想法有些过于简单和直接，而且也发现项目中充斥着许多 Bad Smelling 的代码。但是同时，这个项目十分真实地展现初学者在面对更加复杂的开发时会遇到的难处与困惑。也正是因为有这些困惑的存在，各种框架技术和开发脚手架才有其存在的价值。理解这些新手会有的困惑，可以从另一个角度去理解框架技术的作用与意义。</p>
+</blockquote>
+
+<h2 id="项目简介">项目简介</h2>
+
+<p>Tax Calculator：一个基于 Java + Javascript 实现的个人税务计算器。基本功能是：输入收入、计算并输出应缴税金、修改税务计算规则等。操作说明如下图：</p>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/PersonalTax.JPG-default" alt="" /></p>
+
+<ul>
+  <li>开发环境： JRE 1.8.0_131 (Win 10)</li>
+  <li>技术栈：
+    <ul>
+      <li>前端： Jquery + Bootstrap + Ajax</li>
+      <li>后端： Java</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="开发过程">开发过程</h2>
+
+<h3 id="一-架构设计">(一) 架构设计</h3>
+
+<p>项目架构如下 UML 图所示：</p>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/rear-end-UML.jpg" alt="" /></p>
+
+<p>UML图中省略了 Web UI 的具体实现。其中需要注意的：</p>
+
+<ol>
+  <li>对于 Tax Table，一开始我将 Tax Table 的数据与方法写在同一个类中，后来开发过程中发现应该是将其分开：<strong>将 tax table 的数据作为一个类并设置 get/set 修改器，而具体的对 tax table 的修改，加载，保存等方法写在另外一个命名为 RuleManager 的类中。</strong>这样的好处是低耦合，工程拓展性更好。试想如果工程需要实现多种税务规则共存，或者对税务规则文件的存在多种存储格式，在这些场景下这样的设计能减少修改代码的工作量。另外从语义的角度，这样的设计也更加清晰，代码可读性更高。</li>
+  <li><strong>单独设计 Control 类而不是直接将 main 函数所在的类作为控制类。</strong>同样是处于拓展性考虑，像在此次实验中我设计了两套 UI：命令行 UI 与 Web UI，这样这两个 main 函数就只需要调用 Control 类的方法，两套 UI 互相独立互不影响。</li>
+  <li><strong>严谨地设置单实例类型。</strong></li>
+</ol>
+
+<p>在本次实验过程中，由于对 Java 及相关工具与 API 的不熟悉，在实现过程中走了不少的弯路，其中不乏有一些不止在 Java ， 而且在整个计算机领域都适用的开发经验和体会，所以想在此记录一下。</p>
+
+<h3 id="二-数据存储-java-处理-xml-文件">(二) 数据存储： Java 处理 XML 文件</h3>
+
+<p>本次实验我使用 XML 文件来储存数据，主要是考虑到 XML 平台支持性好，方便后续 Web 的开发，而且数据量不多而且语义性强，用 XML 来处理比较合适。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">load</span><span class="o">()</span> <span class="o">{</span>
+		<span class="n">Document</span> <span class="n">document</span> <span class="o">=</span> <span class="n">parse</span><span class="o">(</span><span class="s">"resource/config.xml"</span><span class="o">);</span>
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="kt">int</span> <span class="n">numOfLevel</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">document</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">"numOfLevel"</span><span class="o">).</span><span class="na">item</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">getTextContent</span><span class="o">());</span>
+			<span class="kt">double</span> <span class="n">firstThreshold</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">document</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">"firstThreshold"</span><span class="o">).</span><span class="na">item</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">getTextContent</span><span class="o">());</span>
+			<span class="kt">double</span> <span class="n">threshold</span><span class="o">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="o">[</span><span class="n">numOfLevel</span><span class="o">];</span>
+			<span class="kt">double</span> <span class="n">taxRate</span><span class="o">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="o">[</span><span class="n">numOfLevel</span><span class="o">];</span>
+			<span class="n">Node</span> <span class="n">thresholdNode</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">"threshold"</span><span class="o">).</span><span class="na">item</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+			<span class="n">Node</span> <span class="n">taxRateNode</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">"taxRate"</span><span class="o">).</span><span class="na">item</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+			<span class="k">if</span> <span class="o">(</span><span class="n">thresholdNode</span><span class="o">.</span><span class="na">getNodeType</span><span class="o">()</span> <span class="o">==</span> <span class="n">Node</span><span class="o">.</span><span class="na">ELEMENT_NODE</span> <span class="o">&amp;&amp;</span> <span class="n">taxRateNode</span><span class="o">.</span><span class="na">getNodeType</span><span class="o">()</span> <span class="o">==</span> <span class="n">Node</span><span class="o">.</span><span class="na">ELEMENT_NODE</span><span class="o">)</span> <span class="o">{</span>
+				<span class="n">Element</span> <span class="n">thresholdElement</span> <span class="o">=</span> <span class="o">(</span><span class="n">Element</span><span class="o">)</span> <span class="n">thresholdNode</span><span class="o">;</span>
+				<span class="n">Element</span> <span class="n">taxRateElement</span> <span class="o">=</span> <span class="o">(</span><span class="n">Element</span><span class="o">)</span> <span class="n">taxRateNode</span><span class="o">;</span>
+				<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numOfLevel</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+					<span class="n">threshold</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">Double</span><span class="o">.</span><span class="na">parseDouble</span><span class="o">(</span><span class="n">thresholdElement</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">"item"</span><span class="o">).</span><span class="na">item</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getTextContent</span><span class="o">());</span>
+					<span class="n">taxRate</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">Double</span><span class="o">.</span><span class="na">parseDouble</span><span class="o">(</span><span class="n">taxRateElement</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">"item"</span><span class="o">).</span><span class="na">item</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getTextContent</span><span class="o">());</span>
+				<span class="o">}</span>
+			<span class="o">}</span>
+			<span class="n">rule</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TaxRule</span><span class="o">(</span><span class="n">numOfLevel</span><span class="o">,</span> <span class="n">firstThreshold</span><span class="o">,</span> <span class="n">threshold</span><span class="o">,</span> <span class="n">taxRate</span><span class="o">);</span>
+		<span class="o">}</span>
+		<span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Wrong format of config.xml!"</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+</code></pre></div></div>
+
+<p>如上代码，实现了从XML文件中加载数据。这里我是用的是最基础的<code class="highlighter-rouge">javax.xml</code>的最原始的 DOM 操作。可以看到代码量还是比较大的。如果是在数据量比较大的其他项目，我想还是使用较为主流的 JDOM 或者 DOM4J。</p>
+
+<h3 id="三-使用-java-实现简单的服务器工作">(三) 使用 Java 实现简单的服务器工作</h3>
+
+<p>在本次实验中我使用<code class="highlighter-rouge">java.net.Socket</code>和<code class="highlighter-rouge">java.net.ServerSocket</code>实现了一个简单的服务器，并根据前端的需求提供相应的接口。本来以为会很简单，但是实际开发中遇到了没有预料到的困难，出了很多莫名其妙的 bug。</p>
+
+<h4 id="request-header-的解析">Request Header 的解析</h4>
+
+<p>Request Header 的基本格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GET /index.html HTTP/1.1
+Host: localhost:8000
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36
+Upgrade-Insecure-Requests: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.8
+</code></pre></div></div>
+
+<p>获取到 Header 字符串后，就可以进行字符串解析，一个简单的例子如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//解析 Request Method</span>
+<span class="kd">private</span> <span class="n">String</span> <span class="nf">parseMethod</span><span class="o">(</span><span class="n">String</span> <span class="n">requestString</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">index</span><span class="o">;</span>
+	<span class="n">index</span> <span class="o">=</span> <span class="n">requestString</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="sc">' '</span><span class="o">);</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span> 
+		<span class="k">return</span> <span class="n">requestString</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">index</span><span class="o">);</span>
+	<span class="o">}</span>
+	<span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>解析其他的信息也于此大同小异，在此不列举，如有需要可以在上文提到的代码地址中查看源代码。由一开始对需要从 Request Header 中获取什么信息没有一个大概的想法，导致最终 Request 类很臃肿，各种 Parser 中存在不少的重复代码。而且解析应该尽量使用正则表达式等效率较高地工具，大量用字符串的相应工具会导致实现臃肿。</p>
+
+<h4 id="response-header-的构造">Response Header 的构造</h4>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendStaticResource</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="kt">byte</span><span class="o">[]</span> <span class="n">bytes</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">BUFFER_SIZE</span><span class="o">];</span>
+  <span class="n">FileInputStream</span> <span class="n">fis</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+  <span class="k">try</span> <span class="o">{</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"method is:"</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="na">getMethod</span><span class="o">());</span>
+      <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">HttpServer</span><span class="o">.</span><span class="na">WEB_ROOT</span><span class="o">,</span> <span class="n">request</span><span class="o">.</span><span class="na">getUri</span><span class="o">());</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">exists</span><span class="o">());</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">exists</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">fis</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileInputStream</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">parseType</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">header</span> <span class="o">=</span> <span class="s">"HTTP/1.1 200\r\n"</span> <span class="o">+</span> <span class="s">"Content-Type: text/"</span> <span class="o">+</span> <span class="n">type</span> <span class="o">+</span> <span class="s">"\r\n"</span> <span class="o">+</span> <span class="s">"Content-Length: "</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">+</span> <span class="s">"\r\n"</span> <span class="o">+</span> <span class="s">"\r\n"</span><span class="o">;</span>
+        <span class="n">output</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">header</span><span class="o">.</span><span class="na">getBytes</span><span class="o">());</span>
+        <span class="kt">int</span> <span class="n">ch</span> <span class="o">=</span> <span class="n">fis</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">bytes</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">BUFFER_SIZE</span><span class="o">);</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">ch</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">output</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">bytes</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">ch</span><span class="o">);</span>
+          <span class="n">ch</span> <span class="o">=</span> <span class="n">fis</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">bytes</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">BUFFER_SIZE</span><span class="o">);</span>
+      <span class="o">}</span>
+  <span class="o">}</span> 
+      <span class="c1">//... </span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Response类中的 <code class="highlighter-rouge">=sendStaticResource()</code> 方法实现了根据 Request 的分析结果，生成对应的 response。要构造一个合法的 Response Header 以保证成功的 response，这次实验我使用简单的字符串拼接的方法，这种方法比较朴素和繁杂，可以使用对应功能的库方法来保证实现的简洁性和准确性。</p>
+
+<h4 id="将文件流或字符串流转二进制流">将文件流或字符串流转二进制流</h4>
+
+<p>或许是由于 Response Header 不完全规范的缘故，我在传输 response body 时遇到了各种各样的 Bug。最终迫于无奈选择将传输数据以明文字符串的形式直接写在 response body 中，待改进。</p>
+
+<h3 id="四-web-ui-实现">(四) Web UI 实现</h3>
+
+<p>界面基于 Bootstrap 前端框架进行搭建。为了保证前端的数据能正常发送到服务器，以及能对服务器的响应做正常的处理，需要在 Javascript 代码中完善前端逻辑。</p>
+
+<h4 id="加载-xml-数据到页面">加载 XML 数据到页面</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">loadXMLDoc</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
+	<span class="kd">var</span> <span class="nx">xmlhttp</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">numOfLevel</span><span class="p">,</span> <span class="nx">firstThreshold</span><span class="p">,</span> <span class="nx">threshold</span><span class="p">,</span> <span class="nx">taxRate</span><span class="p">,</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">xml</span><span class="p">;</span>
+	<span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">XMLHttpRequest</span><span class="p">){</span><span class="c1">// code for IE7+, Firefox, Chrome, Opera, Safari</span>
+  		<span class="nx">xmlhttp</span><span class="o">=</span><span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+  	<span class="p">}</span>
+	<span class="k">else</span><span class="p">{</span><span class="c1">// code for IE6, IE5</span>
+  		<span class="nx">xmlhttp</span><span class="o">=</span><span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="s2">"Microsoft.XMLHTTP"</span><span class="p">);</span>
+  	<span class="p">}</span>
+  	<span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">overrideMimeType</span><span class="p">(</span><span class="s2">"text/xml"</span><span class="p">);</span>
+	<span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+  		<span class="k">if</span> <span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span> <span class="o">&amp;&amp;</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">){</span>
+   			<span class="nx">txt</span> <span class="o">=</span> <span class="s2">"&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Level&lt;/th&gt;&lt;th&gt;Threshold&lt;/th&gt;&lt;th&gt;Tax Rate&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;"</span><span class="p">;</span>
+    		<span class="nx">numOfLevel</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseXML</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">"numOfLevel"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">innerHTML</span><span class="p">);</span>
+    		<span class="nx">firstThreshold</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseXML</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">"firstThreshold"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">innerHTML</span><span class="p">;</span>
+			<span class="nx">threshold</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseXML</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">"threshold"</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+			<span class="nx">taxRate</span> <span class="o">=</span> <span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">responseXML</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">"taxRate"</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+			<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">numOfLevel</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">thresholdItem</span> <span class="o">=</span> <span class="nx">threshold</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">"item"</span><span class="p">)[</span><span class="nx">i</span><span class="p">].</span><span class="nx">innerHTML</span><span class="p">;</span>
+				<span class="nx">taxRateItem</span> <span class="o">=</span> <span class="nx">taxRate</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">"item"</span><span class="p">)[</span><span class="nx">i</span><span class="p">].</span><span class="nx">innerHTML</span><span class="p">;</span>
+				<span class="nx">txt</span> <span class="o">=</span> <span class="nx">txt</span> <span class="o">+</span> <span class="s2">"&lt;tr&gt;&lt;th scope='row'&gt;"</span> <span class="o">+</span> <span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"&lt;/th&gt;&lt;td&gt;&lt;input type='text' class='form-control' readonly='readonly' value='"</span><span class="o">+</span> <span class="nx">thresholdItem</span> <span class="o">+</span> <span class="s2">"'&gt;&lt;/td&gt;&lt;td&gt;&lt;input type='text' class='form-control' readonly='readonly' value='"</span><span class="o">+</span> <span class="nx">taxRateItem</span> <span class="o">+</span> <span class="s2">"'&gt;&lt;/td&gt;&lt;/tr&gt;"</span><span class="p">;</span>
+			<span class="p">}</span>
+		    <span class="nx">txt</span><span class="o">=</span><span class="nx">txt</span> <span class="o">+</span> <span class="s2">"&lt;/tbody&gt;"</span><span class="p">;</span>
+		    <span class="nx">$</span><span class="p">(</span><span class="s2">".table"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">txt</span><span class="p">);</span>
+		    <span class="nx">$</span><span class="p">(</span><span class="s2">"#num-of-level"</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"value"</span><span class="p">,</span> <span class="nx">numOfLevel</span><span class="p">);</span>
+		    <span class="nx">$</span><span class="p">(</span><span class="s2">"#first-threshold"</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"value"</span><span class="p">,</span> <span class="nx">firstThreshold</span><span class="p">);</span>
+	    <span class="p">}</span>
+  	<span class="p">}</span>
+  	<span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">"GET"</span><span class="p">,</span><span class="nx">url</span><span class="p">,</span><span class="kc">true</span><span class="p">);</span>
+	<span class="nx">xmlhttp</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>在 Ajax 中，<code class="highlighter-rouge">xmlhttp.responseXML</code>提供了针对 XML 文件的 DOM 操作，利用 DOM 操作加载 XML 文件数据。</p>
+
+<h4 id="构建-xml-并-post">构建 XML 并 POST</h4>
+
+<p>当用户保存税务规则修改，需要将修改完的新税务表以 XML 形式 POST 给服务器，代码如下：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$</span><span class="p">(</span><span class="s2">"#save_btn"</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">numOfLevel</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">"#num-of-level"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">);</span>
+	<span class="kd">var</span> <span class="nx">firstThreshold</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#first-threshold"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">threshold</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">(</span><span class="nx">numOfLevel</span><span class="p">);</span>
+	<span class="kd">var</span> <span class="nx">taxRate</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">(</span><span class="nx">numOfLevel</span><span class="p">);</span>
+	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">numOfLevel</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">threshold_seletor</span> <span class="o">=</span> <span class="s2">".table &gt; tbody &gt; tr:nth-child("</span> <span class="o">+</span> <span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">") &gt; td:nth-child(2) &gt; input"</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">taxRate_seletor</span> <span class="o">=</span> <span class="s2">".table &gt; tbody &gt; tr:nth-child("</span> <span class="o">+</span> <span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">") &gt; td:nth-child(3) &gt; input"</span><span class="p">;</span>
+		<span class="nx">threshold</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">threshold_seletor</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">;</span>
+		<span class="nx">taxRate</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">taxRate_seletor</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="kd">var</span> <span class="nx">xml</span> <span class="o">=</span> <span class="s2">`xml:&lt;taxRule&gt;&lt;firstThreshold&gt;</span><span class="p">${</span><span class="nx">firstThreshold</span><span class="p">}</span><span class="s2">&lt;/firstThreshold&gt;&lt;numOfLevel&gt;</span><span class="p">${</span><span class="nx">numOfLevel</span><span class="p">}</span><span class="s2">&lt;/numOfLevel&gt;&lt;threshold&gt;`</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">numOfLevel</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="nx">xml</span> <span class="o">=</span> <span class="nx">xml</span> <span class="o">+</span> <span class="s2">`&lt;item&gt;</span><span class="p">${</span><span class="nx">threshold</span><span class="p">[</span><span class="nx">i</span><span class="p">]}</span><span class="s2">&lt;/item&gt;`</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="nx">xml</span> <span class="o">=</span> <span class="nx">xml</span> <span class="o">+</span> <span class="s2">"&lt;/threshold&gt;&lt;taxRate&gt;"</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">numOfLevel</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="nx">xml</span> <span class="o">=</span> <span class="nx">xml</span> <span class="o">+</span> <span class="s2">`&lt;item&gt;</span><span class="p">${</span><span class="nx">taxRate</span><span class="p">[</span><span class="nx">i</span><span class="p">]}</span><span class="s2">&lt;/item&gt;`</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="nx">xml</span> <span class="o">=</span> <span class="nx">xml</span> <span class="o">+</span> <span class="s2">"&lt;/taxRate&gt;&lt;/taxRule&gt;"</span><span class="p">;</span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="nx">xml</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+		<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"post"</span><span class="p">);</span>
+	<span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h2 id="项目总结">项目总结</h2>
+
+<p>第一次尝试开发一个简单的 Hybrid App。全栈开发是几乎每个开发者心中的梦想，在开发过程中，从一开始觉得很简单，到后来遇到了许多困难，由于不熟悉 Java API 走进了许多坑，最后在爬坑掉坑的过程中收获了很多切切实实。开发一个 Hybrid App 要求开发者在开发前做更多更细节的架构设计工作，你需要考虑你的数据如何存储，取出与处理，在这个流通过程中什么架构才能低耦合地进行完善地处理。另外，细节方面，细化到每个需求的技术实现选择哪一个库，选择哪一个 API，选择什么样的数据格式，都是值得斟酌考虑的。</p>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/08/25/Python3-Spider1/" data-toggle="tooltip" data-placement="top" title="Python3爬虫实战(一):requests+正则爬取音乐网站Allmusic">
+                        Previous<br>
+                        <span>Python3爬虫实战(一):requests+正则爬取音乐网站Allmusic</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2017/11/02/ruminations-on-java-1/" data-toggle="tooltip" data-placement="top" title="Java 沉思录(一)：自动装箱实现细节">
+                        Next<br>
+                        <span>Java 沉思录(一)：自动装箱实现细节</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2017/09/29/TaxCalculator";
+    var disqus_url = "http://localhost:4000/2017/09/29/TaxCalculator/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

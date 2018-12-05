@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Unity3D开发(三):打飞碟小游戏 - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2017/06/05/unity3D-learn3/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/unity-bg1.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/unity-bg1.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.3);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Unity3D" title="Unity3D">Unity3D</a>
+                        
+                    </div>
+                    <h1>Unity3D开发(三):打飞碟小游戏</h1>
+                    
+                    
+                    <h2 class="subheading">简单的射击类游戏</h2>
+                    
+                    <span class="meta">Posted by Damon To on June 5, 2017</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>本次实现一个简单的小游戏——打飞碟，鼠标点击飞碟代表射中飞碟，以此来了解一个简单的射击类游戏的实现原理。这里的射击实现，使用的是Unity3D为我们提供的射线与刚体。鼠标点击屏幕时射出射线，射线碰撞刚体时发送信号，射击成功。此外，这里使用到上一篇文章中所提到的工厂模式，以此来管理飞碟游戏对象。</p>
+</blockquote>
+
+<h2 id="游戏简介">游戏简介</h2>
+
+<p>打飞碟小游戏是一款射击类小游戏，游戏规则如下：</p>
+
+<ul>
+  <li>每回合开始，玩家按“空格键”发射若干飞碟（飞碟数量随回合数增加而增加），玩家通过鼠标控制点击，击中飞碟时获得10分。</li>
+  <li>若飞碟直到掉落在地还未被玩家击中，则玩家扣除10分。</li>
+  <li>若玩家分数低于或等于0分时，游戏失败。</li>
+  <li>玩家分数每达到一定分数（20分、40分等），则关卡升级。发射飞碟数量增多，发射速度加快。</li>
+</ul>
+
+<h2 id="游戏展示">游戏展示</h2>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/Disk.gif" alt="" /></p>
+
+<h2 id="设计思路">设计思路</h2>
+
+<p>​	这次游戏设计继续采用MVC架构，根据自顶向下的设计思路，我首先考虑最顶层的控制类<code class="highlighter-rouge">GameScenceController</code>，它应该以<strong>单实例</strong>形式存在，并且通过对其它类提供功能不同的接口来实现向类转达信息。所以从功能考虑，<code class="highlighter-rouge">GameScenceController</code>实现了<code class="highlighter-rouge">IUserInterface</code>（用户操作接口）, <code class="highlighter-rouge">IQueryStatus</code>（状态查询接口）, <code class="highlighter-rouge">setStatus</code>（状态设置接口）, <code class="highlighter-rouge">IScore</code>（分数相关功能接口），这样我们就完成了<code class="highlighter-rouge">Control</code>层的设计。</p>
+
+<p>​	<code class="highlighter-rouge">Model</code>层负责游戏逻辑，这次游戏逻辑较为简单，所以我用<code class="highlighter-rouge">GameModel</code>类来实现控制游戏分数、判断游戏输赢的逻辑功能。</p>
+
+<p>​	<code class="highlighter-rouge">View</code>层较为复杂。首先需要一个场景类<code class="highlighter-rouge">Scence</code>来<strong>设置飞碟的数量大小速度等属性、控制发射飞碟和隐藏飞碟，并且它要负责判断场景中的飞碟状态</strong>并告知控制类。其次，为了实现飞碟对象的重复使用，使用工厂类<code class="highlighter-rouge">DiskFactory</code>类<strong>创建和回收飞碟</strong>。最后，UI部分需要提供两个类：一个<code class="highlighter-rouge">UserInterface</code>类负责<strong>处理用户的操作</strong>，<code class="highlighter-rouge">UI</code>类负责<strong>实现游戏的UI视图</strong>。</p>
+
+<h2 id="开发过程">开发过程</h2>
+
+<p>​	完整代码地址: <a href="https://github.com/DamonDu/Unity3D_Training/tree/master/Disk">GitHub - DamonDu/Unity3D_Training/Disk</a></p>
+
+<h3 id="一理解接口与使用接口">(一)理解“接口”与使用接口</h3>
+
+<p>​	由于之前做的更多是一些C和C++的小项目，对于C#这种纯面向对象语言中“接口”的概念总觉得没办法很好地理解，相信也有许多新手和我有相同的困惑。通过这次项目的开发经历，我觉得自己已经能较完整的理解“接口”这个概念了。下面结合代码来谈谈我个人对“接口”设计的理解：</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">GameScenceController</span> <span class="p">:</span> <span class="n">IUserInterface</span><span class="p">,</span> <span class="n">IQueryStatus</span><span class="p">,</span> <span class="n">setStatus</span><span class="p">,</span> <span class="n">IScore</span>
+<span class="p">{</span>
+  <span class="c1">//...</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">UserInterface</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+	<span class="c1">//...</span>
+	<span class="k">void</span> <span class="nf">Start</span><span class="p">()</span>
+	<span class="p">{</span>
+      	<span class="c1">//将控制类实例转化为特定的接口类型</span>
+    	<span class="n">_uerInterface</span> <span class="p">=</span> <span class="n">GameScenceController</span><span class="p">.</span><span class="nf">getGSController</span><span class="p">()</span> <span class="k">as</span> <span class="n">IUserInterface</span><span class="p">;</span>
+    	<span class="n">_queryStatus</span> <span class="p">=</span> <span class="n">GameScenceController</span><span class="p">.</span><span class="nf">getGSController</span><span class="p">()</span> <span class="k">as</span> <span class="n">IQueryStatus</span><span class="p">;</span>
+    	<span class="n">_changeScore</span> <span class="p">=</span> <span class="n">GameScenceController</span><span class="p">.</span><span class="nf">getGSController</span><span class="p">()</span> <span class="k">as</span> <span class="n">IScore</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>​	像许多新手一样，此前我对接口的理解停留在<strong>重要性</strong>上——使用接口可以使代码可读性更强，结构更加清晰。其实，使用接口在架构设计的层面上看，有一定的<strong>必要性</strong>。就像上面的代码所示，对于<code class="highlighter-rouge">UserInterface</code>类，他需要向控制类获取游戏状态、分数的相关信息，同时需要向控制类传达用户操作信息，但是它<strong>并不需要也不应该得到设置游戏状态的功能</strong>。像这种，需要向一个类提供部分功能的情况，使用接口就能容易地实现，只要将<strong>控制类实例转化为特定的接口类型</strong>，就能限制其提供的功能。这符合面向对象设计的封装性原则。</p>
+
+<h3 id="二关于unity刚体-rigidbody">（二）关于Unity刚体—— <code class="highlighter-rouge">Rigidbody</code></h3>
+
+<p>​	当Unity中的一个对象被添加了<code class="highlighter-rouge">Rigidbody</code>组件，它便成为了一个“刚体”，即Unity会对其应用物理引擎，于是对象便会像现实物体一样存在受到力的作用。这次开发过程在设置<code class="highlighter-rouge">Disk</code>时简单的使用了一下<code class="highlighter-rouge">Rigidbody</code>组件。</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">sendDisk</span><span class="p">(</span><span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;</span> <span class="n">usingDisks</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">usingDisks</span> <span class="p">=</span> <span class="n">usingDisks</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nf">Reset</span><span class="p">(</span><span class="n">round</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">usingDisks</span><span class="p">.</span><span class="n">Count</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">localScale</span> <span class="p">=</span> <span class="n">usingDisks</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">transform</span><span class="p">.</span><span class="n">localScale</span><span class="p">;</span>
+        <span class="n">usingDisks</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">transform</span><span class="p">.</span><span class="n">localScale</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Vector3</span><span class="p">(</span><span class="n">localScale</span><span class="p">.</span><span class="n">x</span> <span class="p">*</span> <span class="n">diskScale</span><span class="p">,</span> <span class="n">localScale</span><span class="p">.</span><span class="n">y</span> <span class="p">*</span> <span class="n">diskScale</span><span class="p">,</span> <span class="n">localScale</span><span class="p">.</span><span class="n">z</span> <span class="p">*</span> <span class="n">diskScale</span><span class="p">);</span>
+        <span class="n">usingDisks</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">Renderer</span><span class="p">&gt;().</span><span class="n">material</span><span class="p">.</span><span class="n">color</span> <span class="p">=</span> <span class="n">diskColor</span><span class="p">;</span>
+        <span class="n">usingDisks</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Vector3</span><span class="p">(</span><span class="n">startPosition</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">startPosition</span><span class="p">.</span><span class="n">y</span> <span class="p">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">startPosition</span><span class="p">.</span><span class="n">z</span><span class="p">);</span>
+      	<span class="c1">//使用Rigidbody</span>
+        <span class="n">Rigidbody</span> <span class="n">rigibody</span><span class="p">;</span>
+        <span class="n">rigibody</span> <span class="p">=</span> <span class="n">usingDisks</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">Rigidbody</span><span class="p">&gt;();</span>
+        <span class="n">rigibody</span><span class="p">.</span><span class="nf">WakeUp</span><span class="p">();</span>
+        <span class="n">rigibody</span><span class="p">.</span><span class="n">useGravity</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+        <span class="n">rigibody</span><span class="p">.</span><span class="nf">AddForce</span><span class="p">(</span><span class="n">startDiretion</span> <span class="p">*</span> <span class="n">Random</span><span class="p">.</span><span class="nf">Range</span><span class="p">(</span><span class="n">diskSpeed</span> <span class="p">*</span> <span class="m">5</span><span class="p">,</span> <span class="n">diskSpeed</span> <span class="p">*</span> <span class="m">8</span><span class="p">)</span> <span class="p">/</span> <span class="m">5</span><span class="p">,</span> <span class="n">ForceMode</span><span class="p">.</span><span class="n">Impulse</span><span class="p">);</span>
+        <span class="n">GameScenceController</span><span class="p">.</span><span class="nf">getGSController</span><span class="p">().</span><span class="nf">setScenceStatus</span><span class="p">(</span><span class="n">ScenceStatus</span><span class="p">.</span><span class="n">shooting</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">void</span> <span class="nf">destroyDisk</span><span class="p">(</span><span class="n">GameObject</span> <span class="n">disk</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">disk</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">Rigidbody</span><span class="p">&gt;().</span><span class="nf">Sleep</span><span class="p">();</span>
+    <span class="n">disk</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">&lt;</span><span class="n">Rigidbody</span><span class="p">&gt;().</span><span class="n">useGravity</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+    <span class="n">disk</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Vector3</span><span class="p">(</span><span class="m">0f</span><span class="p">,</span> <span class="p">-</span><span class="m">99f</span><span class="p">,</span> <span class="m">0f</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>​	结合这次的工厂回收机制，一个Disk使用完毕后并不是将它销毁，而是暂时隐藏等待再次使用。这样的情况下，我们将Disk暂时保存时，需要暂时让其<code class="highlighter-rouge">Rigidbody</code>不工作。原因很简单，如果不停用其<code class="highlighter-rouge">Rigidbody</code>，那么Disk会一直受到力的作用而不停的运动，这显然是会消耗游戏性能的，所以我们不希望这种情况出现。这里我选择了使用<code class="highlighter-rouge">Rigidbody.Sleep()</code>和<code class="highlighter-rouge">Rigidbody.WakeUp()</code>来停用和启用<code class="highlighter-rouge">Rigidbody</code>组件。</p>
+
+<h3 id="三再谈工厂模式">（三）再谈工厂模式</h3>
+
+<p>​	上次制作简单工厂项目时曾小试过一次工厂模式的使用，这次在项目中我同样也引入工厂模式来创建和回收飞碟。</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">DiskFactory</span> <span class="p">:</span> <span class="n">System</span><span class="p">.</span><span class="n">Object</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">GameObject</span> <span class="n">diskPrefab</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="n">DiskFactory</span> <span class="n">_diskFactory</span><span class="p">;</span>
+    <span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;</span> <span class="n">usingDisks</span><span class="p">;</span>
+    <span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;</span> <span class="n">uselessDisks</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="n">DiskFactory</span> <span class="nf">getFactory</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">_diskFactory</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">_diskFactory</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DiskFactory</span><span class="p">();</span>
+            <span class="n">_diskFactory</span><span class="p">.</span><span class="n">uselessDisks</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;();</span>
+            <span class="n">_diskFactory</span><span class="p">.</span><span class="n">usingDisks</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;();</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">_diskFactory</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;</span> <span class="nf">prepareDisks</span><span class="p">(</span><span class="kt">int</span> <span class="n">diskCount</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">diskCount</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">uselessDisks</span><span class="p">.</span><span class="n">Count</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">GameObject</span> <span class="n">disk</span> <span class="p">=</span> <span class="n">GameObject</span><span class="p">.</span><span class="n">Instantiate</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;(</span><span class="n">diskPrefab</span><span class="p">);</span>
+                <span class="n">usingDisks</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">disk</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>
+                <span class="n">GameObject</span> <span class="n">disk</span> <span class="p">=</span> <span class="n">uselessDisks</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
+                <span class="n">uselessDisks</span><span class="p">.</span><span class="nf">RemoveAt</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+                <span class="n">usingDisks</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">disk</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">usingDisks</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">recycleDisk</span><span class="p">(</span><span class="n">GameObject</span> <span class="n">disk</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">index</span> <span class="p">=</span> <span class="n">usingDisks</span><span class="p">.</span><span class="nf">FindIndex</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">x</span> <span class="p">==</span> <span class="n">disk</span><span class="p">);</span>
+        <span class="n">uselessDisks</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">disk</span><span class="p">);</span>
+        <span class="n">usingDisks</span><span class="p">.</span><span class="nf">RemoveAt</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>​	这次的工厂模式实现较为完整，使用两个<code class="highlighter-rouge">List</code>——<code class="highlighter-rouge">usingDisks</code>和<code class="highlighter-rouge">uselessDisks</code>来分别储存正在使用和使用完毕的Disk。需要注意的是，由于<code class="highlighter-rouge">DiskFactory</code>并非是继承<code class="highlighter-rouge">MonoBehaviour</code>的类，所以无法直接导入预设，只能在其它类中导入<code class="highlighter-rouge">Disk</code>预设再将其传给<code class="highlighter-rouge">DiskFactory</code>。</p>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/06/02/unity3D-learn2/" data-toggle="tooltip" data-placement="top" title="Unity3D开发(二):简单工厂模式">
+                        Previous<br>
+                        <span>Unity3D开发(二):简单工厂模式</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2017/06/07/unity3D-learn4/" data-toggle="tooltip" data-placement="top" title="Unity3D开发(四):射箭小游戏">
+                        Next<br>
+                        <span>Unity3D开发(四):射箭小游戏</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2017/06/05/unity3D-learn3";
+    var disqus_url = "http://localhost:4000/2017/06/05/unity3D-learn3/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

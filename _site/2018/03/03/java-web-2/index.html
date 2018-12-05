@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Java Web 开发(二)：配置 SSM 框架 - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2018/03/03/java-web-2/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/java-web-2.jpeg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/java-web-2.jpeg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.4);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#Java Web" title="Java Web">Java Web</a>
+                        
+                        <a class="tag" href="/tags/#Spring" title="Spring">Spring</a>
+                        
+                    </div>
+                    <h1>Java Web 开发(二)：配置 SSM 框架</h1>
+                    
+                    
+                    <h2 class="subheading">spring + SpringMVC + MyBatis</h2>
+                    
+                    <span class="meta">Posted by Damon To on March 3, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>Java Web 开发中，SSH 框架（Struts + Spring + Hibernate）和 SSM 框架（Spring + SpringMVC + MyBatis）是最常见的两个集成框架。它们很好地利用了 Spring IoC 特性，极大程度地减少了代码量和降低了代码之间的耦合度。之前看了一些 Spring Core 和 SpringMVC 的内容，但总觉得对 IoC 和 AOP 等概念没有很深刻的理解。通过这次动手配置 SSM 框架，真的是深刻体会到 Spring IoC 和 Bean 在实际开发中的重要意义。</p>
+
+  <p>项目地址：<a href="https://github.com/DamonDu/ssmTest">https://github.com/DamonDu/ssmTest</a></p>
+</blockquote>
+
+<h3 id="一-项目回顾">(一) 项目回顾</h3>
+
+<p>在上次 Java Web 项目：<a href="http://splitmusic.cn/2017/09/29/TaxCalculator/">Java Web 开发(一)：简易税务计算器</a> 中，我尝试用最原生的 Java 语言（或者说 POJO）实现一个简单的 Http Server。由于项目时间的不足和当时对 Java 语言的不熟悉，最终写出了一个功能十分单一且简陋的 Server，而且充斥着各种 Bad Smelling 的代码。但是该项目也不是完全没有收获，在一次又一次的 Debug 中，我遇到了各种新手可能都会遇到的疑惑：</p>
+
+<ol>
+  <li>单纯使用 POJO，会导致前端代码和后端代码高度耦合，且几乎没有很好的解耦手段。</li>
+  <li>难以实现功能全面的应用，主要原因是没有很好的依赖管理和存在大量的冗余代码。</li>
+  <li>做数据持久化时会遇到各种问题：不友好的数据库管理、拙劣的事务管理……</li>
+</ol>
+
+<p><strong>SSM 框架几乎完美解决了上面提到的问题</strong>：Spring 通过 IoC 和 Bean 使得 POJO 也能低耦合地实现各种业务和服务功能；MyBatis 极大地降低了数据持久化的难度，通过 Mapper 机制简化了数据访问层（DAO）的开发；SprinMVC 则通过 controller 来处理用户请求和后台操作之间的关系，简化了 Web 层的开发；当然，使用 Maven 来进行依赖管理也让工程文件变得更加简洁明了。</p>
+
+<p>接下来，我会按步骤逐一地记录我配置 SSM 的过程，同时解释一些新手开发者可能有疑问的概念以及强调一些我自己掉入的坑。另外，我的配置很大程度上是对 <a href="https://github.com/liyifeng1994/ssm">Github - liyifeng1994/ssm</a> 模仿练习，同时他的 README 也讲解地十分仔细，推荐给大家参考学习。</p>
+
+<h3 id="二-ssm-框架结构">(二) SSM 框架结构</h3>
+
+<h4 id="创建-maven-项目">创建 maven 项目</h4>
+
+<p>我是用的 IDE 是 IDEA，在 IDEA 中创建一个 maven 项目的步骤是：New Project — 选择 Maven — 选择合适的 JDK 版本 — 选择模板（此处略过此步）— New — 填写 GroupId 和 ArtifactId — 设置项目名称与路径 — Finish。</p>
+
+<p>在这里，我填写的 GroupId 为 <code class="highlighter-rouge">cn.damonto</code> ，ArtifactId 为 <code class="highlighter-rouge">ssmTest</code> ，项目名称默认与 ArtifactId 相同。</p>
+
+<blockquote>
+  <p>GroupId 和 ArtifactId 被统称为“坐标”，是为了保证项目唯一性而提出的。</p>
+
+  <p>GroupId 一般分为两段，第一段为域，第二段为公司名称。域又分为org、com、cn等等许多，其中org为非营利组织，com为商业组织。ArtifactId 一般与项目名称相同。</p>
+
+  <p>举个 apache 公司的 tomcat 项目例子：这个项目的 GroupId 是 org.apache，它的域是org，公司名称是apache，ArtifactId 是 tomcat。</p>
+</blockquote>
+
+<h4 id="建立目录结构">建立目录结构</h4>
+
+<p>在进行编码之前，先将一些文件夹提前建立，使得项目最终的目录结构如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssmTest
+	|pom.xml			# maven配置文件
+	|src				# 源代码
+	  |test				# 测试文件
+	  |main				
+	    |java			# java文件
+	    |resources		# xml等配置文件
+	    	|mapper		# mybatis mapper配置文件
+	    	|spring		# spring相关配置文件
+	    |webapp			# Web层
+	    |sql			# SQL文件
+</code></pre></div></div>
+
+<p>在 java 文件夹中创建必要的包，我将包的命名空间统一为 <code class="highlighter-rouge">cn.damonto.ssmTest</code>：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java
+  |cn
+    |damonto
+       |ssmTest
+          |dao			# 数据访问层，Data Access Object
+          |dto			# 数据传输层，Data Transfer Object
+          |entity		# 实体类
+          |service		# 业务逻辑
+            |impl
+          |web			# web controller
+</code></pre></div></div>
+
+<p>提前建立好文件夹与包是必要的，这让我们后续的开发更有条理。</p>
+
+<h3 id="三-配置-pomxml">(三) 配置 pom.xml</h3>
+
+<p><code class="highlighter-rouge">pom.xml</code> 即为 maven 工程实现依赖管理的配置文件。在本项目中，除了必要的 Spring（包括核心库、Dao、test 等）、SpringMVC 和 MyBatis，还需要导入的依赖有：junit（单元测试）、mysql-connector-java（MySQL数据库连接）、c3p0（一个数据库连接池）、mybatis-spring（用于整合 Spring 与 MyBatis）……</p>
+
+<p>各个依赖的具体编码可以在 <a href="https://mvnrepository.com/">Maven Repository: Search/Browse/Explore</a> 中查询得到。</p>
+
+<blockquote>
+  <p>理论上，库应该不存在版本兼容的问题的。但是在这里 mybatis-spring 却出现了版本兼容的问题，使用 1.2.2 版本会出现 <code class="highlighter-rouge">org.mybatis.spring.transaction.SpringManagedTransaction.getTimeout()L</code> 的错误。将版本改为 1.3.0 即可解决这个问题。</p>
+</blockquote>
+
+<p>pom.xml 的具体实现见：<a href="https://github.com/DamonDu/ssmTest/blob/master/pom.xml">pom.xml</a></p>
+
+<h3 id="四-配置-spring-与-mybatis">(四) 配置 Spring 与 MyBatis</h3>
+
+<h4 id="daospring-daoxml-与-mybatis-configxml">DAO：spring-dao.xml 与 mybatis-config.xml</h4>
+
+<p>在 spring 文件夹中创建如下的 spring-dao.xml：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">"http://www.springframework.org/schema/beans"</span>
+       <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+       <span class="na">xmlns:context=</span><span class="s">"http://www.springframework.org/schema/context"</span>
+       <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd"</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!--jdbc相关参数--&gt;</span>
+    <span class="nt">&lt;context:property-placeholder</span> <span class="na">location=</span><span class="s">"classpath:jdbc.properties"</span> <span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!--配置c3p0连接池--&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"dataSource"</span> <span class="na">class=</span><span class="s">"com.mchange.v2.c3p0.ComboPooledDataSource"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"driverClass"</span> <span class="na">value=</span><span class="s">"${jdbc.driver}"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jdbcUrl"</span> <span class="na">value=</span><span class="s">"${jdbc.url}"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"user"</span> <span class="na">value=</span><span class="s">"${jdbc.username}"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"password"</span> <span class="na">value=</span><span class="s">"${jdbc.password}"</span> <span class="nt">/&gt;</span>
+
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"maxPoolSize"</span> <span class="na">value=</span><span class="s">"30"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"minPoolSize"</span> <span class="na">value=</span><span class="s">"10"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"autoCommitOnClose"</span> <span class="na">value=</span><span class="s">"false"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"checkoutTimeout"</span> <span class="na">value=</span><span class="s">"10000"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"acquireRetryAttempts"</span> <span class="na">value=</span><span class="s">"2"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+
+    <span class="c">&lt;!--配置 mybatis 的 sqlSessionFactory--&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"sqlSessionFactory"</span> <span class="na">class=</span><span class="s">"org.mybatis.spring.SqlSessionFactoryBean"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"dataSource"</span> <span class="na">ref=</span><span class="s">"dataSource"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"configLocation"</span> <span class="na">value=</span><span class="s">"classpath:mybatis-config.xml"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"typeAliasesPackage"</span> <span class="na">value=</span><span class="s">"cn.damonto.ssmTest.entity"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"mapperLocations"</span> <span class="na">value=</span><span class="s">"classpath:mapper/*.xml"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+
+    <span class="c">&lt;!--配置扫描DAO包--&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">"org.mybatis.spring.mapper.MapperScannerConfigurer"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"sqlSessionFactoryBeanName"</span> <span class="na">value=</span><span class="s">"sqlSessionFactory"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"basePackage"</span> <span class="na">value=</span><span class="s">"cn.damonto.ssmTest.dao"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+<span class="nt">&lt;/beans&gt;</span>
+</code></pre></div></div>
+
+<p>spring-dao.xml 配置数据访问层，主要包含四个方面的配置：</p>
+
+<ol>
+  <li>
+    <p><strong>从 jdbc.properties 中读取数据库相关参数。</strong>在基于spring开发应用的时候，一般都会将数据库的配置放置在properties文件中。例如：</p>
+
+    <div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">jdbc.driver</span><span class="p">=</span><span class="s">com.mysql.jdbc.Driver</span>
+<span class="py">jdbc.url</span><span class="p">=</span><span class="s">jdbc:mysql://localhost:3306/ssm?useUnicode=true&amp;characterEncoding=utf8</span>
+<span class="py">jdbc.username</span><span class="p">=</span><span class="s">your_username</span>
+<span class="py">jdbc.password</span><span class="p">=</span><span class="s">your_password</span>
+</code></pre></div>    </div>
+
+    <p>在 XML 中，使用 <code class="highlighter-rouge">property-placeholder</code> 来将数据库配置读取并注入，在需要使用配置参数时，通过 <code class="highlighter-rouge">${...}</code> 来选取参数。</p>
+
+    <blockquote>
+      <p>关于 Spring 如何实现配置文件的加载，可以阅读 <a href="https://www.cnblogs.com/leftthen/p/5615066.html">Spring 中 property-placeholder 的使用与解析</a> 进行了解。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>配置 c3p0 连接池。</strong>c3p0 是一个开源的 JDBC 连接池，它实现了数据源和 JNDI 绑定，支持 JDBC3 规范和 JDBC2 的标准扩展。使用连接池可以方便我们对数据库连接进行管理，类似的连接池还有 DBCP、Proxool 、 BoneCP 等。</p>
+
+    <p>从线程的角度看，每创建一个数据库连接（Connection）其实都相当于创建了一个 ThreadLocal，所以连接池本质上也是一个线程池。在 <a href="http://splitmusic.cn/2018/02/08/java-concurrency-learning-2/">Java 并发学习笔记(二)：结构化并发应用程序</a> 一文中，提到过通过公式计算一个最优的线程池大小，可以达到最大化的资源利用。同样，应该也可以使用相同的公式计算出一个最优的连接池大小。</p>
+  </li>
+  <li>
+    <p><strong>配置 MyBatis-Spring。</strong>要和 Spring 一起使用 MyBatis，我们需要在 Spring 应用上下文中定义至少两样东西:一个 <code class="highlighter-rouge">SqlSessionFactory</code> 和至少一个数据映射器类。同时，在这里我们需要<strong>在 resources 文件夹</strong>创建MyBatis 的配置文件mybatis-config.xml，如下：</p>
+
+    <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+    <span class="nt">&lt;settings&gt;</span>
+        <span class="c">&lt;!--开启主键自增--&gt;</span>
+        <span class="nt">&lt;setting</span> <span class="na">name=</span><span class="s">"useGeneratedKeys"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+        <span class="c">&lt;!--开启列名别名--&gt;</span>
+        <span class="nt">&lt;setting</span> <span class="na">name=</span><span class="s">"useColumnLabel"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+        <span class="c">&lt;!--开启驼峰命名转换--&gt;</span>
+        <span class="nt">&lt;setting</span> <span class="na">name=</span><span class="s">"mapUnderscoreToCamelCase"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/settings&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div>    </div>
+
+    <blockquote>
+      <p>需要注意的是”开启驼峰命名转换“。由于 SQL 的变量命名习惯是如同“book_id”的下划线分割形式，而 Java 字段命名一般则是如同“bookId”的驼峰式命名，所以需要开启驼峰命名转换以保证命名规则能互相对应。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>指定与扫描 Dao 包。</strong></p>
+  </li>
+</ol>
+
+<h4 id="servicespring-servicexml">Service：spring-service.xml</h4>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">"http://www.springframework.org/schema/beans"</span>
+       <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+       <span class="na">xmlns:context=</span><span class="s">"http://www.springframework.org/schema/context"</span>
+       <span class="na">xmlns:tx=</span><span class="s">"http://www.springframework.org/schema/tx"</span>
+       <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">"cn.damonto.ssmTest.service"</span> <span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!--注入数据库连接池--&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"transactionManager"</span> <span class="na">class=</span><span class="s">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"dataSource"</span> <span class="na">ref=</span><span class="s">"dataSource"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+
+    <span class="c">&lt;!--基于注解的声明式事务--&gt;</span>
+    <span class="nt">&lt;tx:annotation-driven</span> <span class="na">transaction-manager=</span><span class="s">"transactionManager"</span> <span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/beans&gt;</span>
+</code></pre></div></div>
+
+<p>spring-service.xml 做了三件事：</p>
+
+<ol>
+  <li>开启对 service 包的扫描。</li>
+  <li>注入数据库连接池。</li>
+  <li>开启基于注解的声明式事务。之所以要使用基于注解的声明式事务，主要是为了方便 service 层的开发。事务方法往往是影响服务器性能的关键，使用注解来控制事务便于后期开发的解耦，避免其他层的代码混入事务方法中。</li>
+</ol>
+
+<blockquote>
+  <p>在编写这个配置文件时我的一个小疑惑是： <code class="highlighter-rouge">dataSource</code> 这个 bean reference 是不存在于本文件的上下文环境的，所以 IDE 会提示 Cannot resolve 的错误。在这里是可以忽视这个错误提示的，因为在后期运行时我们必然需要同时加载 spring-service.xml 和 spring-dao.xml，这样在运行时上下文就可以找到 <code class="highlighter-rouge">dataSource</code> 。</p>
+</blockquote>
+
+<h4 id="webspring-webxml-与-webxml">Web：spring-web.xml 与 web.xml</h4>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">"http://www.springframework.org/schema/beans"</span>
+       <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+       <span class="na">xmlns:mvc=</span><span class="s">"http://www.springframework.org/schema/mvc"</span>
+       <span class="na">xmlns:context=</span><span class="s">"http://mybatis.org/schema/mybatis-spring"</span>
+       <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;context:scan</span> <span class="na">base-package=</span><span class="s">"cn.damonto.ssmTest.web"</span> <span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!--配置 Spring MVC--&gt;</span>
+    <span class="nt">&lt;mvc:annotation-driven</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;mvc:default-servlet-handler</span> <span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!--配置 Spring MVC 视图解析器--&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">"org.springframework.web.servlet.view.InternalResourceViewResolver"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"viewClass"</span> <span class="na">value=</span><span class="s">"org.springframework.web.servlet.view.JstlView"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"prefix"</span> <span class="na">value=</span><span class="s">"/WEB-INF/jsp"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"suffix"</span> <span class="na">value=</span><span class="s">".jsp"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+<span class="nt">&lt;/beans&gt;</span>
+</code></pre></div></div>
+
+<p>spring-web.xml 的内容就是简单的配置一下 SpringMVC 了，由于这次我没有想具体的实现 Web 层的东西，所以就只是简单的配置一下 servlet 和 ViewResolver，在这里也不做过多的深入探讨。</p>
+
+<p>在 webapp 文件夹建立如下的目录结构：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>webapp
+  |WEB-INF
+     |jsp
+     |web.xml
+</code></pre></div></div>
+
+<p>web.xml 文件如下，配置了必要的 servlet 和 servlet-mapping：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;web-app</span> <span class="na">xmlns=</span><span class="s">"http://xmlns.jcp.org/xml/ns/javaee"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"</span>
+         <span class="na">version=</span><span class="s">"3.1"</span> <span class="na">metadata-complete=</span><span class="s">"true"</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!--配置 DispatcherServlet--&gt;</span>
+    <span class="nt">&lt;servlet&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>ssmTest-dispatcher<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
+
+        <span class="nt">&lt;init-param&gt;</span>
+            <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
+            <span class="nt">&lt;param-value&gt;</span>classpath:spring/spring-*.xml<span class="nt">&lt;/param-value&gt;</span>
+        <span class="nt">&lt;/init-param&gt;</span>
+    <span class="nt">&lt;/servlet&gt;</span>
+
+    <span class="nt">&lt;servlet-mapping&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>ssmTest-dispatcher<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;url-pattern&gt;</span>/<span class="nt">&lt;/url-pattern&gt;</span>
+    <span class="nt">&lt;/servlet-mapping&gt;</span>
+
+<span class="nt">&lt;/web-app&gt;</span>
+</code></pre></div></div>
+
+<p>至此，一个最基本的 SSM 框架构建完毕。接下来通过一个简单的测试来检查 Spring 与 Mybatis 有没有正确配置。</p>
+
+<h3 id="五-应用与测试">(五) 应用与测试</h3>
+
+<p>在这里，我们通过一个简单的图书管理系统来测试我们的配置。</p>
+
+<h4 id="测试准备">测试准备</h4>
+
+<p>首先测试前要先写好最基本的实体类和接口类，实体类可以参考 <a href="https://github.com/DamonDu/ssmTest/tree/master/src/main/java/cn/damonto/ssmTest/entity">cn.damonto.ssmTest.entity</a> ，Dao 接口类参考 <a href="https://github.com/DamonDu/ssmTest/tree/master/src/main/java/cn/damonto/ssmTest/dao">cn.damonto.ssmTest.dao</a> 。我们只需要定义好 Dao 接口而不需要写具体实现，只要我们编写完对应的 mapper，Mybatis 会帮助我们动态地实现 Dao。</p>
+
+<p>例如 BookDao 对应的 mapper 配置文件 BookDao.xml 代码如下（位于 resources/mapper）：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="cp">&lt;!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</span>
+<span class="nt">&lt;mapper</span> <span class="na">namespace=</span><span class="s">"cn.damonto.ssmTest.dao.BookDao"</span><span class="nt">&gt;</span>
+
+   <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">"queryById"</span> <span class="na">resultType=</span><span class="s">"Book"</span> <span class="nt">&gt;</span>
+       SELECT *
+       FROM book
+       WHERE book_id = #{bookId}
+   <span class="nt">&lt;/select&gt;</span>
+
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">"queryAll"</span> <span class="na">resultType=</span><span class="s">"Book"</span><span class="nt">&gt;</span>
+        SELECT *
+        FROM book
+        ORDER BY book_id
+        LIMIT #{offset}, #{limit}
+    <span class="nt">&lt;/select&gt;</span>
+
+    <span class="nt">&lt;update</span> <span class="na">id=</span><span class="s">"reduceNumber"</span> <span class="nt">&gt;</span>
+        UPDATE book
+        SET book_number = book_number - 1
+        WHERE book_id = #{bookId} AND book_number &gt; 0
+    <span class="nt">&lt;/update&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</code></pre></div></div>
+
+<p>AppointmentDao.xml 如下：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="cp">&lt;!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</span>
+<span class="nt">&lt;mapper</span> <span class="na">namespace=</span><span class="s">"cn.damonto.ssmTest.dao.AppointmentDao"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;insert</span> <span class="na">id=</span><span class="s">"insertAppointment"</span><span class="nt">&gt;</span>
+        INSERT ignore INTO appointment (book_id, student_id)
+        VALUE (#{bookId}, #{studentId})
+    <span class="nt">&lt;/insert&gt;</span>
+
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">"queryByKeyWithBook"</span> <span class="na">resultType=</span><span class="s">"Appointment"</span><span class="nt">&gt;</span>
+        SELECT a.book_id, a.student_id, a.appointment_time,
+          b.book_id "book.book_id", b.book_name "book.book_name", b.book_number "book.book_number"
+        FROM appointment a
+        INNER  JOIN book b ON a.book_id = b.book_id
+        WHERE a.book_id = #{bookId} AND a.student_id = #{studentId}
+    <span class="nt">&lt;/select&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</code></pre></div></div>
+
+<p>可以看到 Mybatis 让我们在 XML 中用与 SQL 语法相似的形式来进行 SQL 操作，并且将 DAO 层的代码很好地解耦，对于我们 SQL 操作的编写和 Debug 都十分方便。</p>
+
+<p>当然，在测试前还需要先在数据库中建好对应的 Table 并插入一些样例数据作测试，SQL 参考如下：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">create</span> <span class="k">table</span> <span class="n">BOOK</span>
+<span class="p">(</span>
+	<span class="n">book_id</span> <span class="n">bigint</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="n">auto_increment</span> <span class="k">comment</span> <span class="s1">'图书ID'</span><span class="p">,</span>
+	<span class="n">book_name</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">comment</span> <span class="s1">'图书名称'</span><span class="p">,</span>
+	<span class="n">book_number</span> <span class="n">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">comment</span> <span class="s1">'图书数量'</span><span class="p">,</span>
+	<span class="k">primary</span> <span class="k">key</span><span class="p">(</span><span class="n">book_id</span><span class="p">)</span>
+<span class="p">)</span><span class="n">engine</span><span class="o">=</span><span class="n">innodb</span> <span class="n">auto_increment</span><span class="o">=</span><span class="mi">1000</span> <span class="k">default</span> <span class="n">char</span> <span class="k">set</span><span class="o">=</span><span class="n">utf8</span><span class="p">;</span>
+
+<span class="k">insert</span> <span class="k">into</span> <span class="n">BOOK</span> <span class="p">(</span><span class="n">book_id</span><span class="p">,</span> <span class="n">book_name</span><span class="p">,</span> <span class="n">book_number</span><span class="p">)</span>
+<span class="n">value</span>
+	<span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s1">'bookA'</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1001</span><span class="p">,</span> <span class="s1">'bookB'</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1002</span><span class="p">,</span> <span class="s1">'bookC'</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1003</span><span class="p">,</span> <span class="s1">'bookD'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+    
+<span class="k">create</span> <span class="k">table</span> <span class="n">APPOINTMENT</span>
+ <span class="p">(</span>
+	<span class="n">book_id</span> <span class="n">bigint</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">comment</span> <span class="s1">'图书ID'</span><span class="p">,</span>
+    <span class="n">student_id</span> <span class="n">bigint</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">comment</span> <span class="s1">'学生ID'</span><span class="p">,</span>
+    <span class="n">appointment_time</span> <span class="k">timestamp</span> <span class="k">not</span> <span class="k">null</span> <span class="k">default</span> <span class="k">current_timestamp</span> <span class="k">on</span> <span class="k">update</span> <span class="k">current_timestamp</span> <span class="k">comment</span> <span class="s1">'预约时间'</span><span class="p">,</span>
+    <span class="k">primary</span> <span class="k">key</span><span class="p">(</span><span class="n">book_id</span><span class="p">,</span> <span class="n">student_id</span><span class="p">),</span>
+    <span class="k">index</span> <span class="n">idx_atime</span><span class="p">(</span><span class="n">appointment_time</span><span class="p">)</span>
+ <span class="p">)</span><span class="n">engine</span><span class="o">=</span><span class="n">innodb</span> <span class="k">default</span> <span class="n">char</span> <span class="k">set</span><span class="o">=</span><span class="n">utf8</span>
+</code></pre></div></div>
+
+<h4 id="编写测试文件">编写测试文件</h4>
+
+<p>在 test/java 文件夹中建立与 src/java 文件夹的包结构，并且在对应的路径下编写测试文件。</p>
+
+<p>首先先写测试基类 BaseTest.java ，在这里我们加载了 spring-dao.xml 和 spring-service.xml，由于不进行 web 层的开发所以不需要 spring-web.xml：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">.</span><span class="na">damonto</span><span class="o">.</span><span class="na">ssmTest</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.runner.RunWith</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.test.context.ContextConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.test.context.junit4.SpringJUnit4ClassRunner</span><span class="o">;</span>
+
+<span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@ContextConfiguration</span><span class="o">({</span><span class="s">"classpath:spring/spring-dao.xml"</span><span class="o">,</span> <span class="s">"classpath:spring/spring-service.xml"</span><span class="o">})</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BaseTest</span> <span class="o">{</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>接着，我们以测试 BookDao 为例：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">.</span><span class="na">damonto</span><span class="o">.</span><span class="na">ssmTest</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">cn.damonto.ssmTest.BaseTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">cn.damonto.ssmTest.entity.Book</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoTest</span> <span class="kd">extends</span> <span class="n">BaseTest</span><span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">BookDao</span> <span class="n">bookDao</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testQueryById</span> <span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">bookId</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+        <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="n">bookDao</span><span class="o">.</span><span class="na">queryById</span><span class="o">(</span><span class="n">bookId</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">book</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testQueryAll</span> <span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;</span> <span class="n">books</span> <span class="o">=</span> <span class="n">bookDao</span><span class="o">.</span><span class="na">queryAll</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">);</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Book</span> <span class="n">book</span> <span class="o">:</span> <span class="n">books</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">book</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testReduceNumber</span> <span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">bookId</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">number</span> <span class="o">=</span> <span class="n">bookDao</span><span class="o">.</span><span class="na">reduceNumber</span><span class="o">(</span><span class="n">bookId</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Update = "</span> <span class="o">+</span> <span class="n">number</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>由于 BookDao 的实现是有 MyBatis 在运行时才进行的，所以编译时会发现 <code class="highlighter-rouge">bookDao</code> 的 bean 装载会提示错误，这个错误同样是可以忽视的。</p>
+</blockquote>
+
+<p>在这里就不做严谨的断言测试了，直接通过控制台输出测试，若无异常应有如下的输入：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Book [book id = 1000, book name = bookA, books number = 10]
+Book [book id = 1000, book name = bookA, books number = 10]
+Book [book id = 1001, book name = bookB, books number = 10]
+Book [book id = 1002, book name = bookC, books number = 10]
+Book [book id = 1003, book name = bookD, books number = 10]
+Update = 1
+</code></pre></div></div>
+
+<p>对于 AppointmentDao 也采取相似的测试，若同样无异常，则证明 SSM 框架配置成功。</p>
+
+<h3 id="六-总结">(六) 总结</h3>
+
+<p>SSM 框架和 SSH 框架几乎可以适用于所有场景的 Java Web 开发，并且可以极大地提高开发效率和提升代码质量。但是还是存在一些问题：</p>
+
+<ol>
+  <li>Spring 和 SpringMVC 过度地依赖 XML 进行配置，虽然已经很大简化了配置但随着项目的复杂必然还是会让配置文件越来越臃肿，不符合现在追求轻量级框架的需求。所以，新兴的更加轻量级 SpringBoot 必然会在未来取代大多数 SpringMVC 的工作。</li>
+  <li>随着服务器流量和并发访问的增加，简单的 SSM 框架肯定是无法满足需求的。并且对于特定用途的服务器（例如需要高响应的游戏服务器），SSM 也是无法很好的工作。</li>
+</ol>
+
+<hr />
+
+<p><em>参考网站：</em></p>
+
+<ol>
+  <li><em>Github - liyifeng1994/ssm：<a href="https://github.com/liyifeng1994/ssm">https://github.com/liyifeng1994/ssm</a></em></li>
+  <li><em>Spring 中 property-placeholder 的使用与解析：<a href="https://www.cnblogs.com/leftthen/p/5615066.html">https://www.cnblogs.com/leftthen/p/5615066.html</a></em></li>
+  <li><em>mybatis-spring document：<a href="http://www.mybatis.org/spring/zh/">http://www.mybatis.org/spring/zh/</a></em></li>
+  <li><em>Ant风格路径表达式详解：<a href="http://www.bug315.com/article/131.htm">http://www.bug315.com/article/131.htm</a></em></li>
+  <li><em>c3p0数据库连接池的使用详解：<a href="https://www.cnblogs.com/fingerboy/p/5184398.html">https://www.cnblogs.com/fingerboy/p/5184398.html</a></em></li>
+</ol>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/02/26/jdk-reading-1/" data-toggle="tooltip" data-placement="top" title="JDK 源码阅读(一)：理解 ThreadLocal">
+                        Previous<br>
+                        <span>JDK 源码阅读(一)：理解 ThreadLocal</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/03/13/ruminations-on-java-2/" data-toggle="tooltip" data-placement="top" title="Java 沉思录(二)：关于 String">
+                        Next<br>
+                        <span>Java 沉思录(二)：关于 String</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/03/03/java-web-2";
+    var disqus_url = "http://localhost:4000/2018/03/03/java-web-2/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
