@@ -3,10 +3,10 @@
   <channel>
     <title>SplitMusic</title>
     <description>Unity &amp; Music | Damon To, student in SYSU | </description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 06 Dec 2018 02:30:44 +0800</pubDate>
-    <lastBuildDate>Thu, 06 Dec 2018 02:30:44 +0800</lastBuildDate>
+    <link>https://damondu.github.io//</link>
+    <atom:link href="https://damondu.github.io//feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Thu, 06 Dec 2018 02:49:51 +0800</pubDate>
+    <lastBuildDate>Thu, 06 Dec 2018 02:49:51 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -100,8 +100,8 @@
 &lt;/div&gt;
 </description>
         <pubDate>Wed, 12 Sep 2018 15:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/09/12/soulmate-at-internet-corner/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/09/12/soulmate-at-internet-corner/</guid>
+        <link>https://damondu.github.io//2018/09/12/soulmate-at-internet-corner/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/09/12/soulmate-at-internet-corner/</guid>
         
         <category>产品</category>
         
@@ -253,8 +253,8 @@
 &lt;/ul&gt;
 </description>
         <pubDate>Tue, 12 Jun 2018 00:25:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/06/12/learn-from-interview/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/06/12/learn-from-interview/</guid>
+        <link>https://damondu.github.io//2018/06/12/learn-from-interview/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/06/12/learn-from-interview/</guid>
         
         <category>NIO</category>
         
@@ -424,8 +424,8 @@ System.out.println(str3 == str4);
 
 </description>
         <pubDate>Tue, 13 Mar 2018 11:25:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/03/13/ruminations-on-java-2/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/13/ruminations-on-java-2/</guid>
+        <link>https://damondu.github.io//2018/03/13/ruminations-on-java-2/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/03/13/ruminations-on-java-2/</guid>
         
         <category>Java</category>
         
@@ -903,8 +903,8 @@ Update = 1
 &lt;/ol&gt;
 </description>
         <pubDate>Sat, 03 Mar 2018 05:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/03/03/java-web-2/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/03/java-web-2/</guid>
+        <link>https://damondu.github.io//2018/03/03/java-web-2/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/03/03/java-web-2/</guid>
         
         <category>Java</category>
         
@@ -1318,8 +1318,8 @@ Update = 1
 
 </description>
         <pubDate>Mon, 26 Feb 2018 06:40:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/02/26/jdk-reading-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/02/26/jdk-reading-1/</guid>
+        <link>https://damondu.github.io//2018/02/26/jdk-reading-1/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/02/26/jdk-reading-1/</guid>
         
         <category>Java</category>
         
@@ -1558,8 +1558,8 @@ Update = 1
 
 </description>
         <pubDate>Tue, 13 Feb 2018 07:30:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/02/13/java-concurrency-learning-4/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/02/13/java-concurrency-learning-4/</guid>
+        <link>https://damondu.github.io//2018/02/13/java-concurrency-learning-4/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/02/13/java-concurrency-learning-4/</guid>
         
         <category>Java</category>
         
@@ -1841,8 +1841,8 @@ Update = 1
 &lt;/ul&gt;
 </description>
         <pubDate>Sun, 11 Feb 2018 02:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/02/11/java-concurrency-learning-3/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/02/11/java-concurrency-learning-3/</guid>
+        <link>https://damondu.github.io//2018/02/11/java-concurrency-learning-3/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/02/11/java-concurrency-learning-3/</guid>
         
         <category>Java</category>
         
@@ -2458,8 +2458,8 @@ Update = 1
 
 </description>
         <pubDate>Fri, 09 Feb 2018 03:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/02/09/java-concurrency-learning-2/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/02/09/java-concurrency-learning-2/</guid>
+        <link>https://damondu.github.io//2018/02/09/java-concurrency-learning-2/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/02/09/java-concurrency-learning-2/</guid>
         
         <category>Java</category>
         
@@ -3036,8 +3036,8 @@ Update = 1
 
 </description>
         <pubDate>Tue, 06 Feb 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/02/06/java-concurrency-learning-1/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/02/06/java-concurrency-learning-1/</guid>
+        <link>https://damondu.github.io//2018/02/06/java-concurrency-learning-1/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2018/02/06/java-concurrency-learning-1/</guid>
         
         <category>Java</category>
         
@@ -3286,8 +3286,8 @@ Update = 1
 &lt;/ul&gt;
 </description>
         <pubDate>Tue, 19 Dec 2017 06:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/12/19/java-virtual-machine-3/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/12/19/java-virtual-machine-3/</guid>
+        <link>https://damondu.github.io//2017/12/19/java-virtual-machine-3/</link>
+        <guid isPermaLink="true">https://damondu.github.io//2017/12/19/java-virtual-machine-3/</guid>
         
         <category>Java</category>
         
