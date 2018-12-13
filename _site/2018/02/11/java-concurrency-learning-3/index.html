@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title> Java 并发学习笔记(三) - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://damondu.github.io//2018/02/11/java-concurrency-learning-3/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/java-concurrency.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/java-concurrency.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.6);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#Concurrency" title="Concurrency">Concurrency</a>
+                        
+                    </div>
+                    <h1> Java 并发学习笔记(三)</h1>
+                    
+                    
+                    <h2 class="subheading">活跃性、性能与测试</h2>
+                    
+                    <span class="meta">Posted by Damon To on February 11, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>这是我阅读<a href="https://book.douban.com/subject/10484692/">《 Java 并发编程实战》</a>整理出的知识大纲，第三部分主要是关于活跃性问题的介绍和避免，性能的分析与优化以及如何对并发程序进行正确的测试。</p>
+</blockquote>
+
+<h3 id="before-reading">Before Reading</h3>
+
+<ol>
+  <li>本篇文章对应原书 10~12 章的内容。</li>
+  <li>建议通读过原书的对应内容后再使用这份知识大纲。</li>
+  <li>大部分内容为原书的摘抄，少部分是我自己的归纳。</li>
+  <li>文章中的代码是从原书 example 中摘抄得来，你可以从<a href="http://jcip.net/listings.html">原书官网</a>获取完整的代码。</li>
+</ol>
+
+<h3 id="避免活跃性危险">避免活跃性危险</h3>
+
+<h4 id="死锁">死锁</h4>
+
+<ul>
+  <li><strong>锁顺序死锁</strong>
+    <ul>
+      <li>发生原因：两个线程试图<strong>以不同的顺序来获得相同的锁</strong>。</li>
+      <li>检查：对加锁行为进行全局分析</li>
+      <li>解决：如果所有线程以固定的顺序来获得锁，那么就不会发生锁顺序死锁；如果一个程序每次至多只能获得一个锁，那么就不会产生锁顺序死锁。</li>
+    </ul>
+  </li>
+  <li><strong>动态的锁顺序死锁</strong>
+    <ul>
+      <li>有时候，并不能清楚地知道是否在锁顺序上有足够的控制权来避免死锁的发生。锁的顺序可能取决于参数顺序，而参数顺序又取决于外部输入。</li>
+      <li>解决：在指定锁顺序时，可以<strong>使用 <code class="highlighter-rouge">System.identityHasdCode</code> 方法</strong>。在极少数情况下，两个对象可能拥有相同的散列值。为了避免这种情况，可以使用<strong>“加时赛（Tie-Breaking）”锁</strong>。在获得两个 Account 锁之前，首先获得这个“加时赛”锁，从而保证每次只有一个线程以未知的顺序获得这两个锁。</li>
+    </ul>
+  </li>
+  <li><strong>协作对象之间发生的死锁</strong>
+    <ul>
+      <li>如果在持有锁时调用某个外部方法，那么将出现活跃性问题。在这个外部方法中可能会获取锁，或者阻塞时间过长，导致其他线程无法及时获得当前被持有的锁。</li>
+      <li><strong>如果在持有锁的情况下调用某个外部方法，那么就需要警惕死锁</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>开放调用（Open Call）</strong>：如果在调用某个方法时不需要持有锁，那么这种调用被称为开放调用。
+    <ul>
+      <li>通过开放调用可以避免死锁。</li>
+      <li><strong>应该尽可能地使用开放调用</strong>：分析一个完全依赖于开放调用的程序的活跃性，要比分析那些不依赖开放调用的程序的活跃性简单。</li>
+      <li>重新编写同步代码块可能会使得某个原子操作变为非原子操作。</li>
+    </ul>
+  </li>
+  <li><strong>资源死锁</strong>
+    <ul>
+      <li>当多个线程在相同的资源集合上等待时，也会发生死锁。</li>
+      <li>原因：在请求两个或多个资源时不始终遵循相同的顺序；任务之间存在依赖，发生线程饥饿死锁。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="死锁的避免和诊断">死锁的避免和诊断</h4>
+
+<ul>
+  <li><strong>限时锁</strong>：使用 <code class="highlighter-rouge">Lock</code> 类中的定时 <code class="highlighter-rouge">tryLock</code> 功能来代替内置锁机制。</li>
+  <li><strong>线程转储（Thread Dump）</strong>：JVM 通过线程转储来帮助识别死锁的发生。线程转储包括各个运行中的线程的栈追踪信息以及加锁信息。JVM将在等待关系图中通过搜索循环来找出死锁。如果发现了一个死锁，则获取相应的死锁信息。</li>
+</ul>
+
+<h4 id="其他活跃性问题">其他活跃性问题</h4>
+
+<ul>
+  <li><strong>饥饿（Starvation）</strong>：当线程由于无法访问它所需要的资源而不能继续执行时，就发生了饥饿。
+    <ul>
+      <li>在大多数 Java 应用程序中，所有线程都具有相同的优先级，通过修改线程优先级所带来的<strong>效果通常不明显</strong>。而且只要改变了线程的优先级，程序的行为就将与平台相关。</li>
+    </ul>
+  </li>
+  <li><strong>活锁（Livelock）</strong>：当多个相互协作的线程都对彼此进行响应从而修改各自的状态，并使得任何一个线程都无法继续执行时，就发生了活锁。
+    <ul>
+      <li>解决：在重试机制中引入随机性。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="性能与可伸缩性">性能与可伸缩性</h3>
+
+<h4 id="性能指标与性能影响因素">性能指标与性能影响因素</h4>
+
+<ul>
+  <li>
+    <p>当操作性能由于某种特定的资源而受到限制时，我们通常将该操作称为资源密集型的操作，例如，CPU密集型、数据库密集型等。</p>
+  </li>
+  <li>
+    <p><strong>要想通过并发来获得更好的性能，需要做好两件事情</strong></p>
+
+    <ul>
+      <li>更有效地利用现有处理资源。</li>
+      <li>在出现新的处理资源时使程序尽可能地利用这些新资源。</li>
+    </ul>
+  </li>
+  <li>
+    <p>性能可以采用多个指标来衡量，其中一些指标（服务时间、等待时间）用于衡量程序的<strong>“运行速度”</strong>，另一些指标（生产量、吞吐量）用于程序的<strong>“处理能力”</strong>。</p>
+  </li>
+  <li>
+    <p><strong>可伸缩性</strong>：当增加计算资源时，程序的吞吐量或者处理能力应当相应地增加。</p>
+
+    <ul>
+      <li>在进行可伸缩性调优时，其目的是设法将问题的计算并行化，从而能利用更多的计算资源来完成更多的工作。</li>
+      <li>对于服务器应用程序来说，“多少”这个方面一一可伸缩性、吞吐量和生产量，往往比“多快”这个方面更受重视。</li>
+    </ul>
+  </li>
+  <li>
+    <p>先使程序正确运行，然后再提高运行速度。</p>
+  </li>
+  <li>
+    <p>在使某个方案比其他方案“更快”之前，首先问自己一些问题：</p>
+
+    <ul>
+      <li>“更快”的含义是什么？</li>
+      <li>该方法在什么条件下运行得更快？在低负载还是高负载的情况下？大数据集还是小数据集？能否通过测试结果来验证你的答案？</li>
+      <li>这些条件在运行环境中的发生频率？能否通过测试结果来验证你的答案？</li>
+      <li>在其他不同条件的环境中能否使用这里的代码？</li>
+      <li>在实现这种性能提升时需要付出哪些隐含的代价，例如增加开发风险或维护开销？这种权衡是否合适？</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Amdahl 定律</strong>：在增加计算资源的情况下，程序在理论上能够实现最高加速比，这个值取决于程序中可并行组件与串行组件所占的比重。假定 F 是必须被串行执行的部分，那么根据 Amdahl 定律，在包含 Ⅳ 个处理器的机器中，最高的加速比为：</p>
+
+    <p><img src="http://ompnv884d.bkt.clouddn.com/Amdahl.png" alt="" /></p>
+  </li>
+  <li>
+    <p>在所有的并发程序中都包含一些串行部分。</p>
+  </li>
+</ul>
+
+<h4 id="线程开销与相应的优化">线程开销与相应的优化</h4>
+
+<ul>
+  <li><strong>引入线程的开销</strong>
+    <ul>
+      <li>上下文切换：切换上下文的开销；在线程调度过程中需要访问由操作系统和 JVM 共享的数据结构；上下文切换会导致一些缓存缺失。</li>
+      <li>内存同步：会抑制一些编译器的优化操作；竞争的同步会导致竞争失败线程的阻塞。</li>
+    </ul>
+  </li>
+  <li><strong>不用过于担心非竞争同步带来的开销</strong>，它对应用程序的整体性能的影响十分微小。</li>
+  <li>减少锁的竞争可以提高性能和可伸缩性。在并发程序中，限制可伸缩性的最主要瓶颈就是<strong>独占方式的资源锁</strong>。</li>
+  <li><strong>降低锁竞争程度的3个方向</strong>
+    <ul>
+      <li>减少锁的持有时间。</li>
+      <li>降低锁的请求频率。</li>
+      <li>使用带有协调机制的独占锁，允许更高的并发性。</li>
+    </ul>
+  </li>
+  <li><strong>减少锁竞争（提高可伸缩性）的具体方法</strong>
+    <ul>
+      <li><strong>缩小锁的范围</strong>：将一些锁无关的代码移出同步代码块（尤其是开销大的操作）。</li>
+      <li><strong>锁分解</strong>：如果一个锁需要保护多个<strong>相互独立</strong>的状态变量，那么可以将这个锁分解为多个锁，并且每个锁只保护一个变量，从而提高可伸缩性，并最终降低每个锁被请求的频率。</li>
+      <li><strong>锁分段</strong>：将锁分解技术进一步扩展为对一组独立对象上的锁进行分解，这种情
+况被称为锁分段。</li>
+      <li><strong>避免热点域（Hot Field）</strong>：一些常见的优化措施，例如将一些反复计算的结果缓存起来，都会引入一些“热点域”，而这些热点域往往会限制可伸缩性。</li>
+      <li><strong>使用其他方法替代独占锁</strong>：使用一种<strong>友好并发的方式</strong>来管理共享状态。例如：并发容器、读 - 写锁、不可变对象以及原子变量。</li>
+    </ul>
+  </li>
+  <li>如果在锁上存在<strong>适中而不是激烈的竞争</strong>时，通过将一个锁分解为两个锁，能最大限度地提升性能（因为实际上是把这些锁转变为非竞争的锁）；把一个<strong>竞争激烈的</strong>锁分解为两个锁时，这两个锁仍然可能都存在激烈的竞争，无法给可伸缩性带来极大的提高。</li>
+  <li><strong>锁分段的一个劣势在于</strong>：要获取多个锁来实现独占访问将更加困难并且开销更高。</li>
+  <li><strong>监测 CPU 的利用率</strong>：如果应用程序正在使 CPU 保持忙碌状态，那么可以使用监视工具来判断是否能通过增加额外的 CPU 来提升程序的性能。<strong>如果 CPU 的利用率很高，并且总会有可运行的线程在等待 CPU</strong>，那么当增加更多的处理器时，程序的性能可能会得到提升。</li>
+  <li><strong>不使用对象池</strong>：通常，对象分配操作的开销比保证对象池同步的开销更低。（除非对象的创建和销毁操作开销十分巨大，但这个时候一般是对象设计存在不合理）</li>
+  <li><strong>减少上下文切换的开销</strong>：一般是通过将异构任务分解。典型的例子是：在日志服务中，将 I/O 操作从日志处理请求的线程中分离出来。</li>
+</ul>
+
+<h3 id="并发程序的测试">并发程序的测试</h3>
+
+<h4 id="正确性测试">正确性测试</h4>
+
+<ul>
+  <li>
+    <p>在为某个并发类设计单元测试时，首先要找出程序的<strong>不变性条件和后验条件</strong>。</p>
+  </li>
+  <li>
+    <p><strong>对阻塞操作的测试</strong></p>
+
+    <ul>
+      <li>在测试并发的基本属性时，<strong>需要引入多个线程</strong>。大多数测试框架并不能很好地支持并发性测试，所以<strong>需要通过一些工作将成功或失败信息传递回主测试线程</strong>，从而才能将相应的信息报告出来。</li>
+      <li>约定：每个测试必须等待它所创建的全部线程结束以后才能完成。</li>
+      <li>简单的实现方式是：使用中断，在一个单独的线程中启动一个阻塞操作，等到线程阻塞后再中断它，然后宣告阻塞操作成功。</li>
+      <li>“等待并直到线程阻塞后”要求我们：估计执行这些指令可能需要多长的时间，并且等待的时间会更长。</li>
+      <li><strong>测试阻塞行为以及对中断的响应</strong>：</li>
+    </ul>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 完整代码：http://jcip.net/listings/TestBoundedBuffer.java</span>
+<span class="kt">void</span> <span class="nf">testTakeBlocksWhenEmpty</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="n">SemaphoreBoundedBuffer</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">bb</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SemaphoreBoundedBuffer</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;(</span><span class="mi">10</span><span class="o">);</span>
+        <span class="n">Thread</span> <span class="n">taker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Thread</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="kt">int</span> <span class="n">unused</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="na">take</span><span class="o">();</span>
+                    <span class="n">fail</span><span class="o">();</span> <span class="c1">// if we get here, it's an error</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">success</span><span class="o">)</span> <span class="o">{</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">};</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">taker</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+            <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">LOCKUP_DETECT_TIMEOUT</span><span class="o">);</span>
+            <span class="n">taker</span><span class="o">.</span><span class="na">interrupt</span><span class="o">();</span>
+              
+            <span class="n">taker</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">LOCKUP_DETECT_TIMEOUT</span><span class="o">);</span>
+            <span class="n">assertFalse</span><span class="o">(</span><span class="n">taker</span><span class="o">.</span><span class="na">isAlive</span><span class="o">());</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">unexpected</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">fail</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></div>    </div>
+
+    <ul>
+      <li>使用 <code class="highlighter-rouge">Thread.getState</code> 来验证线程能否在一个条件等待上阻塞，但这种方法
+并<strong>不可靠</strong>（线程可能通过自旋来实现阻塞）。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>安全性测试</strong></p>
+
+    <ul>
+      <li>要想测试一个并发类在不可预测的并发访问情况下能否正确执行，需要创建多个线程来分别执行并发操作，并在执行一段时间后判断在测试中是否会出现问题。理论上，<strong>测试线程之间产生更多的并发交替操作，则更有可能找出错误</strong>。</li>
+      <li>要开发一个良好的并发测试程序，或许比开发这些程序要测试的类更加困难。所以关键是：<strong>找到容易测试以及容易发生错误的属性，并且在测试中尽量不需要任何同步机制</strong>。</li>
+      <li><strong>提高测试效率</strong>：使用两个 <code class="highlighter-rouge">CountDownLatch</code> （一个开始阀门，一个结束阀门），或者使用 <code class="highlighter-rouge">CyclicBarrier</code> ，可以让测试线程尽可能的并发交替操作。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>资源管理的测试</strong></p>
+
+    <ul>
+      <li>检查程序有无发生资源泄露。</li>
+      <li>使用测量程序中内存使用情况的堆检查工具。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>使用回调函数</strong>：通过在对象生命周期的一些已知位置上执行回调函数，可以判断在这些特定位置上的不变性条件有无得到保证。</p>
+  </li>
+  <li>
+    <p><strong>使用 <code class="highlighter-rouge">Thread.yield</code></strong> ，可以产生更多的并发交替操作，提高发现并发错误的概率。</p>
+  </li>
+</ul>
+
+<h4 id="性能测试">性能测试</h4>
+
+<ul>
+  <li><strong>性能测试的目的</strong>
+    <ul>
+      <li>衡量应用程序中的端到端性能。</li>
+      <li>根据经验值来调整各种不同的限值。</li>
+    </ul>
+  </li>
+  <li><strong>得到每个操作的运行时间</strong>：使用一个栅栏动作来测量启动和结束时间，相减整个运行过程的时间，然后除以总操作的数量，从而得到每次操作的运行时间。</li>
+  <li><strong>响应性衡量</strong>
+    <ul>
+      <li>两个方面：响应时间，响应时间的变动性。</li>
+      <li><strong>如果能获得更小的服务时间变动性，那么更长的平均服务时间是有意义的</strong>。</li>
+      <li>除非线程由于密集的同步需求而被持续地阻塞，否则<strong>非公平</strong>的信号量通常能实现<strong>更好的吞吐量</strong>，而<strong>公平</strong>的信号量则实现<strong>更低的变动性</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>避开性能测试的陷阱</strong>
+    <ul>
+      <li><strong>垃圾回收</strong>：不可预测的垃圾回收会影响每次测试迭代的时间，从而让测试结果变得不可信。有两种解决方法：禁止测试时的垃圾回收；在测试时足够频繁地执行垃圾回收。</li>
+      <li><strong>动态编译</strong>：动态编译的执行时间无法预测，会影响测试结果。三种解决方式：使测试程序运行足够长的时间；先运行被测试程序一段时间后再进行测试；在同一 JVM 上多次测试。</li>
+      <li><strong>对代码路径的不真实采样</strong>：引入多线程的性能测试，即可避免编译器对代码路径的优化。</li>
+      <li><strong>不真实的竞争程度</strong>：在并发测试中，应尽量模拟真实应用环境中的计算量和并发协调开销。</li>
+      <li><strong>无用代码的消除</strong>：在正式产品和测试版本中，都应该选择“-server 模式”，从而提高消除无用代码的程度。同时，为了避免测试相关代码被当作无用代码消除，可以：<strong>计算某个派生对象中域的散列值，并将其与一个任意值比较，若相等则输出一个无用且可以忽略的消息</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>其他的 QA 方法</strong>：<strong>质量保证（Quality Assurance，QA）</strong>的目标应该是在给定的测试资源下实现最高的可信度。测试并非唯一的 QA 方法。
+    <ul>
+      <li>代码审查</li>
+      <li>静态分析工具</li>
+      <li>面向方面的测试技术</li>
+      <li>分析和监测工具</li>
+    </ul>
+  </li>
+</ul>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/02/09/java-concurrency-learning-2/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(二)">
+                        Previous<br>
+                        <span> Java 并发学习笔记(二)</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/02/13/java-concurrency-learning-4/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(四)">
+                        Next<br>
+                        <span> Java 并发学习笔记(四)</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/02/11/java-concurrency-learning-3";
+    var disqus_url = "https://damondu.github.io//2018/02/11/java-concurrency-learning-3/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title> Java 并发学习笔记(一) - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://damondu.github.io//2018/02/06/java-concurrency-learning-1/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/java-concurrency.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/java-concurrency.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.6);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#Concurrency" title="Concurrency">Concurrency</a>
+                        
+                    </div>
+                    <h1> Java 并发学习笔记(一)</h1>
+                    
+                    
+                    <h2 class="subheading">并发基础知识</h2>
+                    
+                    <span class="meta">Posted by Damon To on February 6, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>这是我阅读<a href="https://book.douban.com/subject/10484692/">《 Java 并发编程实战》</a>整理出的知识大纲，第一部分主要是一些关于并发与多线程的基本概念和 Java 中并发编程的基础。</p>
+</blockquote>
+
+<h3 id="before-reading">Before Reading</h3>
+
+<ol>
+  <li>本篇文章对应原书 １~5 章的内容。</li>
+  <li>建议通读过原书的对应内容后再使用这份知识大纲。</li>
+  <li>大部分内容为原书的摘抄，少部分是我自己的归纳。</li>
+  <li>文章中的代码是从原书 example 中摘抄得来，你可以从<a href="http://jcip.net/listings.html">原书官网</a>获取完整的代码。</li>
+</ol>
+
+<h3 id="多线程简介">多线程简介</h3>
+
+<ul>
+  <li>
+    <p>（以<strong>线程</strong>为对象）研究并发的<strong>动机</strong>：由于同一个进程中的所有线程都将共享进程的内存地址空间，因此这些线程都能访问相同的变量并在同一个堆上分配对象，这就需要实现一种<strong>比在进程间共享数据粒度更细</strong>的数据共享机制。</p>
+  </li>
+  <li>
+    <p><strong>多线程的优势</strong></p>
+
+    <ol>
+      <li>
+        <p>发挥多处理器的优势：提高系统<strong>吞吐率</strong>（其实也能提升单处理器系统的吞吐率，主要是减少了等待 I/O 的时间）</p>
+      </li>
+      <li>
+        <p>简化建模：使用线程可以将复杂并且异步的工作流进一步分解为一组简单并且同步的工作流，每个工作流在一个单独的线程中运行，并在特定的同步位置进行交互。</p>
+      </li>
+      <li>
+        <p>简化异步事件的处理：单线程程序中对异步事件的处理：若使用阻塞 I/O 则会造成性能下降；若使用非阻塞 I/O 则复杂度高且易出错。在多线程中，则可简单地使用阻塞 I/O 处理。</p>
+
+        <blockquote>
+          <p>“异步”（asynchronous）在中文语境里的使用较为混乱，在各种中文译本和技术文章里常常不够统一，常见的理解如下：一、指<strong>异步事件（Asynchronous Event）</strong>，即事件结果无法在执行后立即获得，需要在一段较长的时间后才能获得；二、指<strong><a href="https://en.wikipedia.org/wiki/Asynchronous_communication">异步传输/异步通信（Asynchronous Communication）</a></strong>，即数据的接收方和传输方不需要使用一个同步的时钟，在计算机领域可以理解为遇到异步事件时不阻塞而继续执行后续代码，典型的例子就是异步 I/O。</p>
+        </blockquote>
+      </li>
+      <li>
+        <p>响应更灵敏的用户界面（GUI）</p>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p><strong>多线程带来的问题</strong></p>
+
+    <ol>
+      <li>
+        <p>安全性问题：多个线程执行顺序的不可预测带来的运行结果确性上的不可预测。</p>
+
+        <blockquote>
+          <p>认为一段代码是非线程安全的（not thread safe），并不是说其运行结果必然是错的，而是指其运行结果在多线程环境下无法保证绝对的正确性。</p>
+        </blockquote>
+      </li>
+      <li>
+        <p>活跃性问题：当某个操作无法继续执行下去，就会发生活跃性问题（例如死循环）。</p>
+      </li>
+      <li>
+        <p>性能问题：线程切换时的上下文切换操作（Context Switch）造成极大的性能开销。</p>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p><strong>线程安全性需求的蔓延</strong>：当某个框架在应用程序中引入并发性时，通常不可能将并发性仅局限于框架代码，因为框架本身会回调（Callback）应用程序的代码，而这些代码将访问应用程序的状态。</p>
+  </li>
+</ul>
+
+<h3 id="线程安全性"><strong>线程安全性</strong></h3>
+
+<ul>
+  <li>
+    <p>编写线程安全的代码的<strong>核心在于要对状态访问操作进行管理</strong>，更具体地，是对<strong>共享的（Shared）</strong>和<strong>可变的（Mutable）</strong>状态的访问管理。“共享”意味着变量可以由多个线程同时访问，而“可变”则意味着变量的值在其生命周期内可以发生变化。</p>
+  </li>
+  <li><strong>处理安全性问题的三种方式</strong>
+    <ol>
+      <li>不在线程之间共享该状态变量</li>
+      <li>将状态变量设置为不可变</li>
+      <li>在访问状态变量时适用同步</li>
+    </ol>
+  </li>
+  <li>
+    <p><strong>线程安全性的定义：</strong>当多个线程访问某个类时，这个类始终都能表现出正确的行为，那么就称这个类是线程安全的。</p>
+
+    <ul>
+      <li>在线程安全性的定义中，最核心的概念就是<strong>正确性</strong>。 正确性的含义是，某个类的行为与其<strong>规范</strong>完全一致。</li>
+      <li>在良好的<strong>规范</strong>中通常会定义各种<strong>不变性条件（Invariant）</strong>来约束对象的状态，以及定义各种<strong>后验条件（Postcondition）</strong>来描述对象操作的结果。</li>
+    </ul>
+
+    <blockquote>
+      <p>注意区分不可变（immutable）和不变性（Invariant）。</p>
+    </blockquote>
+  </li>
+  <li>无状态对象一定是线程安全的。</li>
+</ul>
+
+<h4 id="原子性">原子性</h4>
+
+<ul>
+  <li>
+    <p><strong>竞态问题（Race Condition）</strong>：两个或多个进程对共享的数据进行读或写的操作时，<strong>最终的结果取决于这些进程的执行顺序</strong>。可以简单地理解为：会引发线程安全性问题的情况。</p>
+
+    <ul>
+      <li>大多数竞态条件的<strong>本质</strong>——基于一种可能失效的观察结果来做出判断或者执行某个计算。</li>
+      <li>典型例子：“先检查后执行”/“读取—修改—写入”。</li>
+      <li>竞态条件并不总是会产生错误，还需要某种不恰当的执行时序。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>原子操作</strong>：对于访问同一个状态的所有操作（包括该操作本身）来说，这个操作是以一个原子的方式执行的操作。<a href="https://docs.oracle.com/javase/8/docs/api/?java/util/concurrent/atomic/package-summary.html">Package java.util.concurrent.atomic</a></p>
+  </li>
+</ul>
+
+<h4 id="加锁机制">加锁机制</h4>
+
+<ul>
+  <li>
+    <p><strong>同步代码块（Synchronized Block）</strong>：线程在进入同步代码块之前会自动获得锁，并且在退出同步代码块时自动释放锁</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">synchronized</span> <span class="o">(</span><span class="n">lock</span><span class="o">)</span> <span class="o">{</span>
+	<span class="c1">//acomic operation </span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>内置锁</strong>：每个Java对象都可以用做一个实现同步的锁，这些锁被称为内置锁<strong>（lntrinsic Lock）</strong>或<strong>监视器锁（Monitor Lock）</strong>。</p>
+
+    <ul>
+      <li>Java 的内置锁相当于一种<strong>互斥体（或互斥锁）</strong>，最多只有一个线程能持有这种锁。</li>
+    </ul>
+  </li>
+  <li>
+    <p>锁的<strong>可重入性</strong>：可重入意味着线程可以进入任何一个它已经拥有的锁所同步着的代码块。“重入”意味着锁的操作粒度是“线程”而不是“调用”。<strong>Java 内置锁是可重入的。</strong></p>
+  </li>
+  <li>
+    <p>每个共享的和可变的变量都应该<strong>只由一个锁来保护</strong>。当不变性条件涉及多个状态变量时，还需保证不变性条件中的每一个变量都有同一个锁保护。</p>
+  </li>
+  <li>
+    <p><strong>不良并发（Poor Concurrency）应用程序</strong>：可同时调用的数量，不仅受到可用处理资源的限制，还受到应用程序本身结构的限制。</p>
+  </li>
+  <li>
+    <p><strong>同步代码块的设置策略</strong>：应该尽量将不影响共享状态且执行时间较长的操作从同步代码块中分离出去，但也不能将同步代码块分解得过细，因为获取和释放锁等操作是有一定性能开销的。</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 缓存最近执行因数分解的数值及其计算结果的 Servlet
+ * 完整代码：http://jcip.net/listings/CachedFactorizer.java
+ */</span>
+<span class="nd">@ThreadSafe</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CachedFactorizer</span> <span class="kd">extends</span> <span class="n">GenericServlet</span> <span class="kd">implements</span> <span class="n">Servlet</span> <span class="o">{</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="n">BigInteger</span> <span class="n">lastNumber</span><span class="o">;</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="n">BigInteger</span><span class="o">[]</span> <span class="n">lastFactors</span><span class="o">;</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="kt">long</span> <span class="n">hits</span><span class="o">;</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="kt">long</span> <span class="n">cacheHits</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">long</span> <span class="nf">getHits</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">hits</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">double</span> <span class="nf">getCacheHitRatio</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="kt">double</span><span class="o">)</span> <span class="n">cacheHits</span> <span class="o">/</span> <span class="o">(</span><span class="kt">double</span><span class="o">)</span> <span class="n">hits</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">service</span><span class="o">(</span><span class="n">ServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">ServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">BigInteger</span> <span class="n">i</span> <span class="o">=</span> <span class="n">extractFromRequest</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+        <span class="n">BigInteger</span><span class="o">[]</span> <span class="n">factors</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="o">++</span><span class="n">hits</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">i</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">lastNumber</span><span class="o">))</span> <span class="o">{</span>
+                <span class="o">++</span><span class="n">cacheHits</span><span class="o">;</span>
+                <span class="n">factors</span> <span class="o">=</span> <span class="n">lastFactors</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">factors</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">//不影响共享状态且执行时间较长的操作</span>
+            <span class="n">factors</span> <span class="o">=</span> <span class="n">factor</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">lastNumber</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+                <span class="n">lastFactors</span> <span class="o">=</span> <span class="n">factors</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="n">encodeIntoResponse</span><span class="o">(</span><span class="n">resp</span><span class="o">,</span> <span class="n">factors</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="对象的共享">对象的共享</h3>
+
+<h4 id="可见性">可见性</h4>
+
+<ul>
+  <li>
+    <p><strong>可见性（VIsibility）</strong>：当一个线程修改了对象状态后，其他线程可以看到发生的状态变化。</p>
+  </li>
+  <li>
+    <p>在缺乏足够同步的多线程程序中，由于代码<strong>重排序（Reordering）</strong>的存在，内存操作的执行顺序几乎是无法确定的。</p>
+  </li>
+  <li>
+    <p>在缺乏同步的程序中可能产生错误结果的一种情况：<strong>失效数据</strong>。更糟糕的是，失效值可能不会同时出现：一个线程可能获得某个变量的最新值，而获得另一个变量的失效值。</p>
+  </li>
+  <li>
+    <p><strong>最低安全性（out-of-thin-airsafety）</strong>：当线程在没有同步的情况下读取变量时，可能会得到一个失效值，但至少这个值是由之前某个线程设置的值，而不是一个随机值。这种安全性保证也被称为最低安全性（out-of-thin-airsafety）。</p>
+  </li>
+  <li>
+    <p><strong>加锁与可见性</strong>：加锁可以用于确保某个线程以一种可预测的方式来查看另一个线程的执行结果。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">volatile</code> <strong>变量</strong>：一种稍弱的同步机制，确保将变量的更新操作通知到其他线程。（编译器和运行时都不会将该变量上的操作进行重排序）。</p>
+
+    <ul>
+      <li>仅当 <code class="highlighter-rouge">volatile</code> 变量能简化代码的实现以及对同步策略的验证时才应该适用它，因为通过 <code class="highlighter-rouge">volatile</code> 来控制状态的可见性比使用加锁机制脆弱且难以理解。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>当且仅当满足以下所有条件时，才应该使用</strong> <code class="highlighter-rouge">volatile</code> <strong>变量</strong></p>
+
+    <ul>
+      <li>对变量的写入操作不依赖变量的当前值，或者你能确保只有单个线程更新变量的值。</li>
+      <li>该变量不会与其他状态变量一起纳入不变性条件中。</li>
+      <li>在访问变量时不需要加锁。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="发布与逸出">发布与逸出</h4>
+
+<ul>
+  <li>
+    <p><strong>发布（Publish）</strong>：使对象能够在当前作用域之外的代码中使用。</p>
+  </li>
+  <li>
+    <p><strong>逸出（Escape）</strong>：发布内部状态可能会破坏封装性，并使得程序难以维持不变性条件。当某个不应该发布的对象被发布时，这种情况就被称为逸出（Escape）。</p>
+  </li>
+  <li>
+    <p><strong>当发布某个对象时，可能会间接地发布其他对象。</strong>当发布一个对象时，在该对象的非私有域中引用的所有对象同样会被发布。</p>
+  </li>
+  <li>
+    <p><strong>当把一个对象传递给某个外部方法时，就相当于发布了这个对象。</strong></p>
+  </li>
+  <li>
+    <p><strong>外部（Alien）方法</strong>：假定有一个类 C，外部（Alien）方法指行为并不完全由 C 来规定的方法，包括其他类中定义的方法以及类C中可以被改写的方法。</p>
+  </li>
+  <li>
+    <p><strong>不要在构造过程中使用 this 引用逸出。</strong>例如：在构造函数中启动一个线程。可以通过延迟启动，或者使用一个私有构造函数与公共工厂方法来避免逸出。</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 使用工厂方法来防止 this 引用在构造过程中逸出
+ * 完整代码：http://jcip.net/listings/SafeListener.java
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SafeListener</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">EventListener</span> <span class="n">listener</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nf">SafeListener</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">listener</span> <span class="o">=</span> <span class="k">new</span> <span class="n">EventListener</span><span class="o">()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onEvent</span><span class="o">(</span><span class="n">Event</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">doSomething</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">};</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">SafeListener</span> <span class="nf">newInstance</span><span class="o">(</span><span class="n">EventSource</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SafeListener</span> <span class="n">safe</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SafeListener</span><span class="o">();</span>
+        <span class="n">source</span><span class="o">.</span><span class="na">registerListener</span><span class="o">(</span><span class="n">safe</span><span class="o">.</span><span class="na">listener</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">safe</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>线程封闭（Thread Confinement）</strong>：一种避免使用同步的方式就是不共享数据。如果仅在单线程内访问数据，就不需要同步。这种技术被称为<strong>线程封闭（Thread Confinement）</strong>，它是实现线程安全性的最简单方式之一。</p>
+
+    <ul>
+      <li><strong>Ad-hoc 线程封闭</strong>：维护线程封闭性的职责<strong>完全</strong>由程序实现来承担。Ad-hoc线程封闭是<strong>非常脆弱</strong>的。当决定使用线程封闭技术时，通常是因为要将某个特定的子系统实现为一个<strong>单线程子系统</strong>。在某些情况下，单线程子系统提供的简便性要胜过Ad-hoc线程封闭技术的脆弱性。</li>
+      <li><strong>栈封闭</strong>：线程封闭的一种特例。在栈封闭中，<strong>只能通过局部变量</strong>才能访问对象。栈封闭（也被称为线程内部使用或者线程局部使用）比Ad-hoc线程封闭更<strong>易于维护</strong>，也<strong>更加健壮</strong>。</li>
+      <li><code class="highlighter-rouge">ThreadLocal</code> <strong>类</strong>：这个类能使线程中的某个值与保存值的对象关联起来。<code class="highlighter-rouge">ThreadLocal</code> 提供了 <code class="highlighter-rouge">get</code> 与 <code class="highlighter-rouge">set</code> 等访问接口或方法，这些方法为每个使用该变量的线程都存有一份独立的副本，因此 <code class="highlighter-rouge">get</code> 总是返回由当前执行线程在调用 <code class="highlighter-rouge">set</code> 时设置的最新值。<code class="highlighter-rouge">ThreadLocal</code> 通常用于防止对<strong>可变的单实例变量（Singleton）或全局变量</strong>进行共享。<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html">Class ThreadLocal</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="不变性">不变性</h4>
+
+<ul>
+  <li>
+    <p><strong>不可变对象（Immutable Object）</strong>：如果某个对象在被创建后其状态就不能被修改，那么这个对象就称为不可变对象。</p>
+
+    <ul>
+      <li>不可变对象一定是线程安全的。</li>
+      <li>不可变性并不等于将对象中所有的域都声明为 <code class="highlighter-rouge">final</code> 类型，即使对象中所有的域都是 <code class="highlighter-rouge">final</code> 类型的，这个对象也仍然是可变的，因为在 <code class="highlighter-rouge">final</code> 类型的域中可以保存对可变对象的引用。</li>
+      <li>“不可变的对象”与“不可变的对象引用”之间存在着差异。保存在不可变对象中的程序状态仍然可以更新，即通过<strong>将一个保存新状态的实例来“替换”原有的不可变对象。</strong></li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>当满足以下条件时，对象才是不可变的</strong></p>
+
+    <ul>
+      <li>对象创建以后其状态就不能修改。</li>
+      <li>对象的所有域都是 <code class="highlighter-rouge">final</code> 类型。</li>
+      <li>对象是正确创建的（在对象的创建期间，<code class="highlighter-rouge">this</code> 引用没有逸出）。</li>
+    </ul>
+  </li>
+  <li>
+    <p>即使对象是可变的，通过将对象的某些域声明为 <code class="highlighter-rouge">final</code> 类型，仍然可以简化对状态的判断，因此限制对象的可变性也就相当于<strong>限制了该对象可能的状态集合</strong>。</p>
+  </li>
+  <li>
+    <p>使用 <code class="highlighter-rouge">volatile</code> 类型发布不可变对象来保证线程安全</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * Immutable holder for caching a number and its factors
+ * 完整代码：http://jcip.net/listings/OneValueCache.java
+ */</span>
+<span class="nd">@Immutable</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OneValueCache</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">BigInteger</span> <span class="n">lastNumber</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">BigInteger</span><span class="o">[]</span> <span class="n">lastFactors</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">OneValueCache</span><span class="o">(</span><span class="n">BigInteger</span> <span class="n">i</span><span class="o">,</span>
+                         <span class="n">BigInteger</span><span class="o">[]</span> <span class="n">factors</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">lastNumber</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="n">lastFactors</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">factors</span><span class="o">,</span> <span class="n">factors</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">BigInteger</span><span class="o">[]</span> <span class="nf">getFactors</span><span class="o">(</span><span class="n">BigInteger</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">lastNumber</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="o">!</span><span class="n">lastNumber</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">i</span><span class="o">))</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">else</span>
+            <span class="k">return</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">lastFactors</span><span class="o">,</span> <span class="n">lastFactors</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * Caching the last result using a volatile reference to an immutable holder object
+ * 完整代码：http://jcip.net/listings/VolatileCachedFactorizer.java
+ */</span>
+<span class="nd">@ThreadSafe</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">VolatileCachedFactorizer</span> <span class="kd">extends</span> <span class="n">GenericServlet</span> <span class="kd">implements</span> <span class="n">Servlet</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">OneValueCache</span> <span class="n">cache</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OneValueCache</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">service</span><span class="o">(</span><span class="n">ServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">ServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">BigInteger</span> <span class="n">i</span> <span class="o">=</span> <span class="n">extractFromRequest</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+        <span class="n">BigInteger</span><span class="o">[]</span> <span class="n">factors</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="na">getFactors</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">factors</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">factors</span> <span class="o">=</span> <span class="n">factor</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+            <span class="n">cache</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OneValueCache</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">factors</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">encodeIntoResponse</span><span class="o">(</span><span class="n">resp</span><span class="o">,</span> <span class="n">factors</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>即使在发布不可变对象的引用时没有使用同步，也仍然可以安全地访问该对象。</p>
+  </li>
+</ul>
+
+<h4 id="安全发布">安全发布</h4>
+
+<ul>
+  <li>
+    <p><strong>一个正确构造的对象可以通过以下方式来安全地发布</strong></p>
+
+    <ul>
+      <li>在静态初始化函数中初始化一个对象引用。</li>
+      <li>将对象的引用保存到 <code class="highlighter-rouge">volatile</code> 类型的域或者 <code class="highlighter-rouge">AtomicReference</code> 对象中。</li>
+      <li>将对象的引用保存到某个正确构造对象的 <code class="highlighter-rouge">final</code> 类型域中。</li>
+      <li>将对象的引用保存到一个由锁保护的域中。</li>
+    </ul>
+  </li>
+  <li><strong>事实不可变对象（Effectively Immutable Object）</strong>：如果对象从技术上来看是可变的，但其状态在发布后不会再改变，那么把这种对象称为事实不可变对象（Effectively Immutable Object）。通过使用事实不可变对象，不仅可以简化开发过程，而且还能由于减少了同步而提高性能。</li>
+  <li><strong>可变对象的安全发布</strong>：如果对象在构造后可以修改，那么安全发布只能确保<strong>“发布当时”</strong>状态的可见性。对于可变对象，不仅在发布对象时需要使用同步，而且在<strong>每次</strong>对象访问时同样需要使用同步来确保后续修改操作的可见性。</li>
+  <li>
+    <p><strong>对象的发布需求取决于它的可变性</strong></p>
+
+    <ul>
+      <li>不可变对象可以通过任意机制来发布。</li>
+      <li>事实不可变对象必须通过安全方式来发布。</li>
+      <li>可变对象必须通过安全方式发布，且必须是线程安全的或者由某个锁保护起来。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="对象的组合">对象的组合</h3>
+
+<h4 id="实例封闭">实例封闭</h4>
+
+<ul>
+  <li>
+    <p><strong>实例封闭（Instance Confinement）</strong>：也称封闭，将数据封装在对象内部，将数据的访问限制在对象的方法上，从而更容易确保线程在访问数据时能持有正确的锁。</p>
+
+    <ul>
+      <li>实例封闭是构建线程安全类的一个最简单的方式，具有灵活性。</li>
+      <li>通过装饰器（Decorator）实现线程安全本质上就是一种实例封闭。</li>
+    </ul>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * Using confinement to ensure thread safety
+ * 完整代码：http://jcip.net/listings/VolatileCachedFactorizer.java
+ */</span>
+<span class="nd">@ThreadSafe</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PersonSet</span> <span class="o">{</span>
+    <span class="nd">@GuardedBy</span><span class="o">(</span><span class="s">"this"</span><span class="o">)</span> <span class="kd">private</span> <span class="kd">final</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">Person</span><span class="o">&gt;</span> <span class="n">mySet</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Person</span><span class="o">&gt;();</span>
+
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">addPerson</span><span class="o">(</span><span class="n">Person</span> <span class="n">p</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">mySet</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">boolean</span> <span class="nf">containsPerson</span><span class="o">(</span><span class="n">Person</span> <span class="n">p</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">mySet</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">interface</span> <span class="nc">Person</span> <span class="o">{</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Java 监视器模式</strong>：把对象的所有可变状态都封装起来，并由对象自己的内置锁来保护。</p>
+  </li>
+  <li>
+    <p><strong>使用私有锁而不是置锁（或任何其他可通过公有方式访问的锁）有许多优点。</strong>私有的锁对象可以将锁封装起来，使客户代码无法得到锁，但客户代码可以通过公有方法来访问锁，以便（正确或者不正确地）参与到它的同步策略中。</p>
+  </li>
+</ul>
+
+<h4 id="委托">委托</h4>
+
+<ul>
+  <li>
+    <p><strong>线程安全性的委托</strong>：向一个无状态的类 A 中添加一个线程安全的类型 B 的属性，所得组合对象仍然是线程安全的，因为A的状态就是线程安全类B的状态，并且A没有对B的状态增加额外的有效性的约束，则可以说A将它的线程安全性<strong>委托</strong>给了B。</p>
+  </li>
+  <li>
+    <p>可以将线程安全性委托给<strong>多个</strong>底层的状态变量，只要满足：状态变量之间是<strong>相互独立且线程安全</strong>的，并且不<strong>存在将状态变量转化为无效状态的操作</strong>即可。（然而状态之间并非相互独立）</p>
+  </li>
+  <li>
+    <p>修改接口以发布底层的可变状态</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 安全发布底层状态的车辆追踪器
+ * 完整代码：http://jcip.net/listings/PublishingVehicleTracker.java
+ */</span>
+<span class="nd">@ThreadSafe</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PublishingVehicleTracker</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">SafePoint</span><span class="o">&gt;</span> <span class="n">locations</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">SafePoint</span><span class="o">&gt;</span> <span class="n">unmodifiableMap</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">PublishingVehicleTracker</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">SafePoint</span><span class="o">&gt;</span> <span class="n">locations</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">locations</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">SafePoint</span><span class="o">&gt;(</span><span class="n">locations</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">unmodifiableMap</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">unmodifiableMap</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">locations</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">SafePoint</span><span class="o">&gt;</span> <span class="nf">getLocations</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">unmodifiableMap</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">SafePoint</span> <span class="nf">getLocation</span><span class="o">(</span><span class="n">String</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">locations</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setLocation</span><span class="o">(</span><span class="n">String</span> <span class="n">id</span><span class="o">,</span> <span class="kt">int</span> <span class="n">x</span><span class="o">,</span> <span class="kt">int</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">locations</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">id</span><span class="o">))</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"invalid vehicle name: "</span> <span class="o">+</span> <span class="n">id</span><span class="o">);</span>
+        <span class="n">locations</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">id</span><span class="o">).</span><span class="na">set</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>在现有的线程安全类中添加功能的方法</strong></p>
+
+    <ul>
+      <li><strong>修改</strong>原有的类：安全且容易理解与维护，但往往无法做到。</li>
+      <li><strong>扩展</strong>原有的类：并非所有的类都将所有状态向子类公开；脆弱，不易维护。</li>
+      <li><strong>客户端加锁</strong>：对于使用某个对象 x 的客户端代码，使用 x 本身用于保护其状态的锁来保护这段客户代码；更加脆弱、高耦合、不易维护。</li>
+      <li><strong>组合（Composition）</strong>：通过委托实现，虽然增加额外的同步层带来了轻微的性能损失但更为健壮。</li>
+    </ul>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 通过客户端加锁实现“若没有则增加”
+ * 完整代码：http://jcip.net/listings/ListHelpers.java
+ */</span>
+<span class="nd">@ThreadSafe</span>
+<span class="kd">class</span> <span class="nc">GoodListHelper</span> <span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;());</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">putIfAbsent</span><span class="o">(</span><span class="n">E</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">boolean</span> <span class="n">absent</span> <span class="o">=</span> <span class="o">!</span><span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">absent</span><span class="o">)</span>
+                <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">absent</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 通过组合加锁实现“若没有则增加”
+ * 完整代码：http://jcip.net/listings/ImprovedList.java
+ */</span>
+<span class="nd">@ThreadSafe</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ImprovedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">ImprovedList</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span> <span class="k">this</span><span class="o">.</span><span class="na">list</span> <span class="o">=</span> <span class="n">list</span><span class="o">;</span> <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">boolean</span> <span class="nf">putIfAbsent</span><span class="o">(</span><span class="n">T</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">boolean</span> <span class="n">contains</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">contains</span><span class="o">)</span>
+            <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">contains</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="基础构建模块">基础构建模块</h3>
+
+<h4 id="同步容器">同步容器</h4>
+
+<ul>
+  <li><strong>同步容器</strong>包括 <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Vector.html">Vector</a> 和 <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Hashtable.html">Hashtable</a> 。JDK1.2 提供了Collections.synchronizedXxx等工程方法，该方法将指定集合对象的状态封装起来，并对每个公有方法都进行
+同步，并返回指定集合对象对应的同步对象。
+    <ul>
+      <li><strong>同步容器类的问题</strong>：虽然在单个方法被使用时可以保证线程安全，但<strong>复合操作</strong>则需要额外的客户端加锁来保护。</li>
+      <li>由于“及时失败”（fail-first）机制，当迭代器发现容器在迭代过程中被修改时，就会抛出一个 <code class="highlighter-rouge">ConcurrentModificationException</code> 异常。</li>
+      <li>解决 <code class="highlighter-rouge">ConcurrentModificationException</code> 异常的方法：一种方法是对迭代行为加锁，但是降低了并发性且可能会产生死锁；另一种方法是“克隆”整个容器并让迭代在克隆容器上进行，缺点是克隆容器时的有性能开销。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="并发容器">并发容器</h4>
+
+<ul>
+  <li><strong>并发容器</strong>： <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html">ConcurrentHashMap</a> / <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/CopyOnWriteArrayList.html">CopyOnWriteArrayList</a> / <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Queue.html">Queue</a> / <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html">BlockingQueue</a>
+    <ul>
+      <li>并发容器的迭代器不会抛出 <code class="highlighter-rouge">ConcurrentModificationException</code> 异常且具有弱一致性（Weakly Consistent）。弱一致性的迭代器可以容忍并发的修改，当创建迭代器时会遍历已有的元素，并可以（但是不保证）在迭代器被构造后将修改操作反映给容器。</li>
+      <li>并发容器的一些方法（如 <code class="highlighter-rouge">size</code> 和 <code class="highlighter-rouge">isEmpty</code>）的语义被略微减弱以反映并发特性。例如：允许 <code class="highlighter-rouge">size</code> 返回一个近似值而非精确值。</li>
+      <li>一些常见的复合操作在容器中实现为原子操作。</li>
+    </ul>
+  </li>
+  <li>阻塞队列支持<strong>生产者—消费者模式</strong>，这种模式消除了生产者与消费者之间的代码依赖性，简化工作负载的管理。常见的生产者—消费者模式：线程池和工作队列的组合。</li>
+  <li>双端队列（Deque）适用于工<strong>作密取模式（Work Stealing）</strong>。</li>
+</ul>
+
+<h4 id="同步工具类">同步工具类</h4>
+
+<ul>
+  <li><strong>同步工具类</strong>根据自身的状态来协调线程的控制类。</li>
+  <li><strong>闭锁（Latch）</strong>：延迟线程的进度直到其到达终止状态，用来确保某些活动知道其他活动都完成后才继续执行。
+    <ul>
+      <li><a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/CountDownLatch.html">CountDownLatch</a></li>
+      <li>打开闭锁使得主线程能同时释放所有工作线程，而光笔闭锁则使得主线程能够等待最后一个线程执行完成。</li>
+      <li><a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/FutureTask.html">FutureTask</a> 也可用于实现闭锁，它可以处于三种状态：等待运行、正在运行、运行完成。它可以用于使计算在使用计算结果之前启动，减少等待计算的时间。</li>
+    </ul>
+  </li>
+  <li><strong>计数信号量（Couting Semaphore）</strong>：用来控制同时访问某个特定资源的操作量，或者同时执行某个指定操作的数量。还可以用来实现某种资源池，或者对容器施加边界。</li>
+  <li><strong>栅栏（Barrier）</strong>：类似于闭锁，它能阻塞一组线程直到某个事件发生。与闭锁的关键区别在于，所有线程必须同时到达栅栏位置，才能继续执行。（即闭锁用于等待事件，而栅栏用于等待其他线程）
+    <ul>
+      <li><a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/CyclicBarrier.html">CyclicBarrier</a></li>
+      <li>两方栅栏 <a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Exchanger.html">Exchanger</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/12/19/java-virtual-machine-3/" data-toggle="tooltip" data-placement="top" title="深入理解Java虚拟机(三)">
+                        Previous<br>
+                        <span>深入理解Java虚拟机(三)</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/02/09/java-concurrency-learning-2/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(二)">
+                        Next<br>
+                        <span> Java 并发学习笔记(二)</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/02/06/java-concurrency-learning-1";
+    var disqus_url = "https://damondu.github.io//2018/02/06/java-concurrency-learning-1/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

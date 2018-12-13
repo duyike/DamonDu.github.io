@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>项目总结：近期的两个小项目 - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://damondu.github.io//2018/06/12/learn-from-interview/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/learn-from-interview.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/learn-from-interview.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.3);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#NIO" title="NIO">NIO</a>
+                        
+                        <a class="tag" href="/tags/#Websocket" title="Websocket">Websocket</a>
+                        
+                        <a class="tag" href="/tags/#JWT" title="JWT">JWT</a>
+                        
+                        <a class="tag" href="/tags/#Spring" title="Spring">Spring</a>
+                        
+                    </div>
+                    <h1>项目总结：近期的两个小项目</h1>
+                    
+                    
+                    <h2 class="subheading">Learn from interview</h2>
+                    
+                    <span class="meta">Posted by Damon To on June 12, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>近期为了应对校招面试，比较有针对性地做了两个技术项目：一个是基于 Java NIO 实现的简易版非阻塞 Http 服务器，另一个是基于 Spring Boot + Websocket 实现的网络聊天室。与以往的项目总结不同，这次我会忽略一些代码实现细节，把更多的篇幅用来总结开发过程中我遇到的难题以及在面试中面试官提出的相关问题。</p>
+</blockquote>
+
+<h3 id="基于-java-nio-实现的简易版非阻塞-http-服务器">基于 Java NIO 实现的简易版非阻塞 Http 服务器</h3>
+
+<p>首先需要强调的是，这种 <a href="https://github.com/DamonDu/nio-server">Http 服务器的实现</a>是非常朴素直接的，没有考虑很多具体实践中的问题。最近在看<a href="https://www.amazon.com/Netty-Action-Norman-Maurer/dp/1617291471">《Netty In Action》</a>才越来越感觉之前做项目时想法上的过于单纯。但项目本身其实十分适合初学者进阶的，因为其中涉及到的知识：Java NIO、网络多路复用、Http 报文解析、缓冲区设计，都是十分重要的基础问题，也是在校招技术面试中面试官喜欢深入考察的问题。在开发过程中，我借鉴了 <a href="http://wiki.jikexueyuan.com/project/java-nio-zh/java-nio-non-blocking-server.html">Java NIO: Non-blocking Server非阻塞服务器</a>这篇文章的思路，上面提及的几个关键问题文章中也有较为详细的解析。</p>
+
+<h4 id="项目基本架构">项目基本架构</h4>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/nio-aarchitecture.png" alt="" /></p>
+
+<h4 id="java-bionioaio">Java BIO/NIO/AIO</h4>
+
+<p>关于 Java BIO/NIO/AIO 这三者的区别，个人觉得 <a href="https://www.programering.com/a/MDM0YzMwATE.html">Java BIO, NIO, AIO understanding</a> 这篇文章总结得十分简洁到位，作者分别从编程、原理、底层三方面进行总结。编程方面作者讲解的十分到位，而要理解原理部分可能需要一些 Unix 网络编程的相关知识，以下就做一些网络编程相关的补充：</p>
+
+<ul>
+  <li>Unix 网络编程中将 IO 模型分为五类：阻塞 IO、非阻塞 IO（轮询）、IO 复用、信号驱动式 IO、异步 IO。其中非阻塞 IO（轮询）、IO 复用、信号驱动式 IO 都可以理解为非阻塞 IO 的不同形式实现。（<a href="https://blog.csdn.net/lihao21/article/details/51620374">图解UNIX的I/O模型</a>一文可以让你快速理解 Unix 中的 IO 模型）</li>
+  <li>无论是属于哪种 IO 模型，其 IO 过程都可以分为两个阶段： IO request（数据请求）和 IO operation（数据复制）两个阶段。</li>
+  <li>阻塞 IO 与非阻塞 IO 的区别在于：使用阻塞 IO 时，线程在 IO request 和 IO operation 阶段都会进入阻塞；而使用非阻塞 IO 时，线程只在 IO operation 阶段进入阻塞，IO request 无需阻塞。</li>
+  <li>
+    <p>同步 IO 与异步 IO 的区别在于：同步 IO 在 IO operation 阶段会进入阻塞，而异步 IO 在 IO request 和 IO operation 阶段都不会进入阻塞。</p>
+  </li>
+  <li>按照 Unix 网络编程中对 IO 模型的分类，Java BIO/NIO/AIO 的实现分别对应了阻塞 IO/IO 多路复用/异步 IO 这三种模型。</li>
+</ul>
+
+<h4 id="bio-vs-nio">BIO vs NIO</h4>
+
+<p>Java AIO（在 JDK 1.7 中也称为 NIO.2），在性能上相较于 NIO 并没有带来提升，所以在 Netty 4.0.0 中也<a href="https://github.com/netty/netty/issues/2515">移除了对 AIO 的支持</a>。无论是在实际应用中还是在技术面试中都较少提及 AIO，这里我们重点比较一下 BIO 与 NIO 的区别：</p>
+
+<ol>
+  <li>处理的对象：BIO 直接面向 Socket 的字节流，每次从流中读一个或多个字节，直到读取完所有字节；NIO 面向缓冲块（Block），需要时可以在缓冲区中前后移动处理，这增加了处理过程的灵活性。</li>
+  <li>阻塞：BIO 必须要对线程进行阻塞，NIO 无需阻塞，一个单独的线程可以管理多个输入和输出通道。</li>
+  <li>选择器：Java NIO的选择器允许一个单独的线程同时监视多个通道，可以注册多个通道到同一个选择器上，然后使用一个单独的线程来“选择”已经就绪的通道。</li>
+  <li>零拷贝：Java NIO中提供的 <code class="highlighter-rouge">FileChannel</code> 拥有 <code class="highlighter-rouge">transferTo</code> 和 <code class="highlighter-rouge">transferFrom</code> 两个方法，可直接把 <code class="highlighter-rouge">FileChannel</code> 中的数据拷贝到另外一个 Channel，或者直接把另外一个 Channel 中的数据拷贝到 <code class="highlighter-rouge">FileChannel</code> 。通过该方法传输数据并不需要将源数据从内核态拷贝到用户态，再从用户态拷贝到目标通道的内核态，同时也<strong>避免了两次用户态和内核态间的上下文切换</strong>，也即使用了“零拷贝”。</li>
+</ol>
+
+<p><em>总结自：<a href="http://www.jasongj.com/java/nio_reactor/">Java进阶（五）Java I/O模型从 BIO到 NIO和 Reactor模式</a></em></p>
+
+<h4 id="http-报文及解析">HTTP 报文及解析</h4>
+
+<p>项目中对 HTTP 协议的支持也做了简化处理：只判别了 GET、POST、HEAD、PUT、DELETE 五种方法，主要是基于 HTTP 的 Content-Length 字段来实现 HTTP 报文切割（处理 TCP 粘包问题）。但是在面试中，HTTP 协议几乎是所有面试官会深究的一部分内容。大概涉及的问题如下：</p>
+
+<ul>
+  <li>
+    <p>HTTP 报文格式：</p>
+
+    <p><img src="http://ompnv884d.bkt.clouddn.com/Http-format.png" alt="" /></p>
+  </li>
+  <li>
+    <p>HTTP Method 有哪些？</p>
+  </li>
+  <li>
+    <p>HTTP 常见状态码有哪些？</p>
+  </li>
+  <li>
+    <p>HTTP 建立 TCP 长连接？（Connection：Keep-Alive）</p>
+  </li>
+  <li>
+    <p><a href="https://www.jianshu.com/p/52d86558ca57">HTTP 1.0/1.1/2.0 之间的区别？</a></p>
+  </li>
+</ul>
+
+<h4 id="message-缓冲区设计">Message 缓冲区设计</h4>
+
+<ul>
+  <li>读取不完整的 message：每次 Reader 从 Channel 读取一个数据块后，先<strong>通过一个 Http 报文 parser 来确定是否有一个完整的 message</strong>。若有，则读取一个完整的 message 后将剩余部分缓存起来；若无，则直接将整个数据块缓存起来。缓存的数据块将在下次读取时与下次读取的数据块合并，再进行重新的 parsing。</li>
+  <li>message buffer 的大小：MessageBuffer 实现了一个容量可伸缩的 message buffer。它提供三种大小的 buffer，4KB/128KB/1MB。初始时 buffer 默认为 4KB，若空间不足时，MessageBuffer 内部的方法会自动将 buffer 扩容。</li>
+  <li>message buffer 的读写：仿写了 <code class="highlighter-rouge">nio.Buffer</code> 中的 <code class="highlighter-rouge">flip()</code> 函数（<code class="highlighter-rouge">readPos</code> 和 <code class="highlighter-rouge">writePos</code>），在 message buffer 的读写操作中调用 <code class="highlighter-rouge">flip()</code> 来避免错读、漏读。</li>
+</ul>
+
+<h4 id="生产者-消费者队列">生产者-消费者队列</h4>
+
+<p>用一个 ArrayBlockingQueue 来存放 socket，创建两个线程，acceptor 和 processor 分别使用其 put / take 操作来进行生产和消费。</p>
+
+<blockquote>
+  <p>关于 ArrayBlockingQueue：</p>
+
+  <ol>
+    <li>基于数组，直接将对象放入和取出队列。（LinkedBlockingQueue 基于单向链表，放入与取出时操作 Node）</li>
+    <li>基于一个 ReentrantLock 和两个 Condition（notEmpty 和 notFull） 实现。（LinkedBlockingQueue 基于两个 ReentrantLock ：putLock 和 takeLock 和两个 Condition：notEmpty 和 notFull 实现）</li>
+  </ol>
+</blockquote>
+
+<h3 id="基于-spring-boot--websocket-实现的网络聊天室">基于 Spring Boot + Websocket 实现的网络聊天室</h3>
+
+<p><a href="https://github.com/DamonDu/websocketchat">项目实现了一个简单的网络聊天室</a>，基于 Spring Boot 搭建后台，基于 Websocket 与 STOMP 协议实现即时通讯，使用 Spring Security 与 Spring Oauth 实现用户登录，基于 JWT 实现对单点登录的支持。</p>
+
+<h4 id="oauth-验证流程">Oauth 验证流程</h4>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/springbootwebsocket.png" alt="" /></p>
+
+<h4 id="websocket-协议">Websocket 协议</h4>
+
+<p>参考<a href="http://www.infoq.com/cn/articles/deep-in-websocket-protocol">WebSocket协议深入探究</a></p>
+
+<h4 id="jwt">JWT</h4>
+
+<ul>
+  <li>
+    <p>JWT(Json Web Token) 一个非常轻巧的规范。这个规范允许我们使用JWT在用户和服务器之间传递安全可靠的信息。</p>
+  </li>
+  <li>
+    <p>字符串形式，三部分组成：头部（Header）、载荷（Payload）、签名（Signature）</p>
+  </li>
+  <li>
+    <p>头部：用于描述 JWT</p>
+
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"typ"</span><span class="p">:</span><span class="w"> </span><span class="s2">"JWT"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"alg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HS256"</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">指定签名的加密算法</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>载荷：真正需要传递的内容 + 部分其他信息</p>
+
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"User JWT"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1441593502</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1441594722</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"aud"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.example.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sub@example.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"from_user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"B"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"target_user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>签名：用于在服务端判断 JWT 的内容是否经过篡改，使用 JWT 头部指定的加密算法。</p>
+  </li>
+  <li>
+    <p>格式：header.payload.signature（先通过 base64 将 JSON 转化为字符串）</p>
+  </li>
+  <li>
+    <p>载荷内容可以通过 base64 反编码获得，所以不应用 JWT 传输敏感数据。</p>
+  </li>
+  <li>
+    <p>使用场景：添加好友、创建订单、实现单点登录</p>
+  </li>
+</ul>
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/03/13/ruminations-on-java-2/" data-toggle="tooltip" data-placement="top" title="Java 沉思录(二)：关于 String">
+                        Previous<br>
+                        <span>Java 沉思录(二)：关于 String</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/09/12/soulmate-at-internet-corner/" data-toggle="tooltip" data-placement="top" title="互联网角落的「Soulmate」">
+                        Next<br>
+                        <span>互联网角落的「Soulmate」</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/06/12/learn-from-interview";
+    var disqus_url = "https://damondu.github.io//2018/06/12/learn-from-interview/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

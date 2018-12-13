@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Java 沉思录(二)：关于 String - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://damondu.github.io//2018/03/13/ruminations-on-java-2/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/ruminations-java.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/ruminations-java.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.6);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#JDK" title="JDK">JDK</a>
+                        
+                    </div>
+                    <h1>Java 沉思录(二)：关于 String</h1>
+                    
+                    
+                    <h2 class="subheading">从源码角度分析</h2>
+                    
+                    <span class="meta">Posted by Damon To on March 13, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>很长时间没有写「Java 沉思录」这个系列。前段时间学习一些比较进阶一点的 Java 知识，但回头看看最基础的 String 类，越发觉得往往越基础的知识反而越重要。这篇文章基于 JDK 源码出发，希望能纠正我们对 String 类的一些误解。同时强烈地推荐来自 ImportNew 社区的这篇<a href="http://www.importnew.com/18167.html">《探秘 Java 中 String、StringBuilder以及StringBuffer》</a>，文章由浅入深，并且结合了一些面试中和应用中的实际问题，是一篇很好的技术博客。</p>
+</blockquote>
+
+<h3 id="一-为什么说-string-是不可变的">(一) 为什么说 String 是不可变的？</h3>
+
+<p>Java 中 String 是不可变的。这句话几乎是每个 Java 初学者第一句深刻记忆的句子，但是其背后的原因是什么。我们尝试从 JDK 源码出发进行分析，JDK 中 String 的部分源码如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">String</span>
+    <span class="kd">implements</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span><span class="o">,</span> <span class="n">Comparable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;,</span> <span class="n">CharSequence</span> <span class="o">{</span>
+    <span class="cm">/** The value is used for character storage. */</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">char</span> <span class="n">value</span><span class="o">[];</span>
+
+    <span class="cm">/** Cache the hash code for the string */</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">hash</span><span class="o">;</span> <span class="c1">// Default to 0</span>
+
+    <span class="cm">/** use serialVersionUID from JDK 1.0.2 for interoperability */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6849794470754667710L</span><span class="o">;</span>
+
+    <span class="cm">/** Class String is special cased within the Serialization Stream Protocol. */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ObjectStreamField</span><span class="o">[]</span> <span class="n">serialPersistentFields</span> <span class="o">=</span>
+        <span class="k">new</span> <span class="n">ObjectStreamField</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+        
+    <span class="o">...</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>“String 是不可变的” 这个观点是正确的，但<strong>关于其原因的解释却容易有以下这些误区</strong>：</p>
+
+<ol>
+  <li>错误一：因为 String 是 <code class="highlighter-rouge">final</code> 的。<code class="highlighter-rouge">final</code>  修饰类时代表该类不可以被继承，而非不可变。</li>
+  <li>错误二：因为 <code class="highlighter-rouge">value</code> 字段是 <code class="highlighter-rouge">fina</code> 的。<code class="highlighter-rouge">final</code> 修饰字段时，若字段是基础类型则意味着字段不可变；而在这里修饰的 <code class="highlighter-rouge">value</code> 字段是引用类型，这意味着引用是固定的，但其引用的具体内容（即数组内容）仍是可变的。</li>
+</ol>
+
+<p>其实如果<strong>我们只从 String 的字段角度看，是无法确定它是不可变的。我们需要结合 String 的方法来看。</strong>我们挑出 String 其中一个方法的实现：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="n">String</span> <span class="nf">replace</span><span class="o">(</span><span class="kt">char</span> <span class="n">oldChar</span><span class="o">,</span> <span class="kt">char</span> <span class="n">newChar</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">oldChar</span> <span class="o">!=</span> <span class="n">newChar</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+        <span class="kt">char</span><span class="o">[]</span> <span class="n">val</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span> <span class="cm">/* avoid getfield opcode */</span>
+
+        <span class="k">while</span> <span class="o">(++</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">val</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">==</span> <span class="n">oldChar</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">char</span> <span class="n">buf</span><span class="o">[]</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="o">[</span><span class="n">len</span><span class="o">];</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">i</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="n">buf</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">[</span><span class="n">j</span><span class="o">];</span>
+            <span class="o">}</span>
+            <span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
+                <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="n">val</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+                <span class="n">buf</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="o">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">oldChar</span><span class="o">)</span> <span class="o">?</span> <span class="n">newChar</span> <span class="o">:</span> <span class="n">c</span><span class="o">;</span>
+                <span class="n">i</span><span class="o">++;</span>
+            <span class="o">}</span>
+            <span class="c1">// 返回一个新的字符串</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">String</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">replace</code> 方法是新手最容易错误使用的方法之一。它的作用是返回一个将原字符串中所有为 <code class="highlighter-rouge">oldChar</code> 的字符替换为 <code class="highlighter-rouge">newChar</code> 的字符。新手如果忘记 String 是不可变的，往往会认为 <code class="highlighter-rouge">replace</code> 方法会对原字符串修改。然而实际上 <code class="highlighter-rouge">replace</code> 并不修改原字符串，它只是<strong>返回了一个进行了字符替换的新的字符串</strong>。</p>
+
+<p>无独有偶，其实 <strong>String 中的每个方法都不修改原字符串，而是返回一个新的字符串。</strong></p>
+
+<p>既然 <strong>String 类本身没有提供修改 <code class="highlighter-rouge">value</code> 的方法，而我们又无法继承和改写 String，所以 String 自然是不可变的。</strong>（这里我们不考虑通过反射来进行修改的情况）</p>
+
+<h3 id="二-string-与字符串常量重用">(二) String 与字符串常量重用</h3>
+
+<p>String 的不可变性使得字符串重用的实现变得简单，而字符串重用带来的是减少对象创建带来的性能上的优化。例如下面代码：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">str1</span> <span class="o">=</span> <span class="s">"str"</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">str2</span> <span class="o">=</span> <span class="s">"str"</span><span class="o">;</span>
+</code></pre></div></div>
+
+<p>Java 字符串常量的重用，与之前我们在 <a href="http://splitmusic.cn/2017/12/17/java-virtual-machine-2/">深入理解Java虚拟机(二)：虚拟机执行子系统</a> 中讨论的类加载机制密不可分：</p>
+
+<blockquote>
+  <ol>
+    <li>Class 文件的常量池（称为 Class 文件常量池）存放着字面量与符号引用</li>
+    <li>运行时 JVM 方法区的常量池（称为运行时常量池）存放对应的字面量与符号引用</li>
+    <li>类加载时，JVM 将字节流所代表的静态存储结构转化为方法区的运行时数据结构。其中就包括了将 Class 文件常量池的字面量和符号引用加载到方法区的运行时常量池中。</li>
+  </ol>
+</blockquote>
+
+<p>JVM 加载上面的两个语句所在的类时，会有如下现象：</p>
+
+<ol>
+  <li>Class 文件常量池存放两个 ”str“ 字面量</li>
+  <li>运行时，在创建 <code class="highlighter-rouge">str1</code> 时，JVM 检查<strong>运行时常量池</strong>，没有找到 ”str“ 这个字面量，于是创建该字面量并将其引用赋值给 <code class="highlighter-rouge">str1</code></li>
+  <li>在创建 <code class="highlighter-rouge">str2</code> 时，JVM 再次检查<strong>运行时常量池</strong>，这次由于运行时常量池已有 ”str“ 字面量，根据字符串重用的机制，JVM 不重复创建字面量，而是将原有的 ”str“ 的引用直接赋值给 <code class="highlighter-rouge">str2</code></li>
+</ol>
+
+<p>我们可以进行如下测试：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>System.out.println(str1 == str2);
+</code></pre></div></div>
+
+<p>结果输出必然为 <code class="highlighter-rouge">true</code> ，因为 <code class="highlighter-rouge">str1</code> 与 <code class="highlighter-rouge">str2</code> 本就是相同的引用。</p>
+
+<p>这里的代码存在另一种需要区分的情况：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String str3 = new String("str");
+String str4 = new String("str");
+System.out.println(str3 == str4);
+</code></pre></div></div>
+
+<p>这里的输出为 <code class="highlighter-rouge">false</code> 。通过 new 来创建 String，将会在堆区创建不同的对象，对象引用自然也就不同。</p>
+
+<h3 id="三-stringstringbuilderstringbuffer">(三) String、StringBuilder、StringBuffer</h3>
+
+<p>String 的不可变性带来了便捷，但也带来了一些不便。不便在于，当我们需要多次地修改某个 String 对象时，直观地看，由于 String 的不可变，似乎每次修改都需要重新 new 一个 String 实例，这将带来极大地空间浪费和 GC 压力。JDK 设计者为了规避这种不便，在<strong>底层的实现中采用可变的 StringBuilder 来避免频繁地对象创建</strong>。</p>
+
+<p>我们以 String 中实现字符串拼接的 <code class="highlighter-rouge">join()</code> 方法为例：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">join</span><span class="o">(</span><span class="n">CharSequence</span> <span class="n">delimiter</span><span class="o">,</span> <span class="n">CharSequence</span><span class="o">...</span> <span class="n">elements</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Objects</span><span class="o">.</span><span class="na">requireNonNull</span><span class="o">(</span><span class="n">delimiter</span><span class="o">);</span>
+    <span class="n">Objects</span><span class="o">.</span><span class="na">requireNonNull</span><span class="o">(</span><span class="n">elements</span><span class="o">);</span>
+    <span class="c1">// Number of elements not likely worth Arrays.stream overhead.</span>
+    <span class="n">StringJoiner</span> <span class="n">joiner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringJoiner</span><span class="o">(</span><span class="n">delimiter</span><span class="o">);</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">CharSequence</span> <span class="nl">cs:</span> <span class="n">elements</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">joiner</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">cs</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">joiner</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">join()</code> 本身并不实现具体的字符串拼接，而是交由 <code class="highlighter-rouge">joiner</code> 来实现。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="n">StringJoiner</span> <span class="nf">add</span><span class="o">(</span><span class="n">CharSequence</span> <span class="n">newElement</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">prepareBuilder</span><span class="o">().</span><span class="na">append</span><span class="o">(</span><span class="n">newElement</span><span class="o">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">prepareBuilder()</code> 顾名思义，创建并初始化了一个 StringBuilder 对象。在这里可以看出，String 中的 <code class="highlighter-rouge">join()</code>方法在实现中是基于 StringBuilder 的 <code class="highlighter-rouge">append()</code> 方法实现。也正是由于这个优化，才提高了在使用 ”+“ 对多个字符串进行拼接时的性能。</p>
+
+<p>而至于 StringBuffer，除了和 StringBuilder 一样是可变的之外，还增加了多线程下的线程安全保证。所以在这三者之间进行选择时，一是我们要<strong>根据字符串修改是否频繁来决定使用 String 还是 StringBuilder 和 StringBuffer</strong>；二是要<strong>根据是否处于多线程环境来决定使用 StringBuilder 或是 StringBuffer</strong>。</p>
+
+<hr />
+
+<p><em>参考资料：</em></p>
+
+<ol>
+  <li><em>探秘 Java中 String、StringBuilder以及 StringBuffer： <a href="http://www.importnew.com/18167.html">http://www.importnew.com/18167.html</a></em></li>
+  <li><em>JDK 之 String 源码阅读笔记：<a href="https://emacsist.github.io/2017/07/01/JDK-%E4%B9%8B-String-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">https://emacsist.github.io/2017/07/01/JDK-%E4%B9%8B-String-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</a></em></li>
+</ol>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/03/03/java-web-2/" data-toggle="tooltip" data-placement="top" title="Java Web 开发(二)：配置 SSM 框架">
+                        Previous<br>
+                        <span>Java Web 开发(二)：配置 SSM 框架</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/06/12/learn-from-interview/" data-toggle="tooltip" data-placement="top" title="项目总结：近期的两个小项目">
+                        Next<br>
+                        <span>项目总结：近期的两个小项目</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/03/13/ruminations-on-java-2";
+    var disqus_url = "https://damondu.github.io//2018/03/13/ruminations-on-java-2/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

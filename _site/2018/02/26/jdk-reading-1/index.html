@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Unity & Music | Damon To, student in SYSU | ">
+    <meta name="keywords"  content="Damon To, 杜一柯, SplitMusic, 杜一柯的博客, @SplitMusic, Damon To blog, 博客, 个人网站, 互联网, Unity, 乐评, 音乐">
+    <meta name="theme-color" content="#000000">
+    
+    <title>JDK 源码阅读(一)：理解 ThreadLocal - </title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://damondu.github.io//2018/02/26/jdk-reading-1/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="/css/collections.css" />
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SplitMusic</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/collections/">Collections</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/jdk-threadlocal.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/jdk-threadlocal.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.4);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                        
+                        <a class="tag" href="/tags/#JDK" title="JDK">JDK</a>
+                        
+                        <a class="tag" href="/tags/#ThreadLocal" title="ThreadLocal">ThreadLocal</a>
+                        
+                        <a class="tag" href="/tags/#Concurrency" title="Concurrency">Concurrency</a>
+                        
+                    </div>
+                    <h1>JDK 源码阅读(一)：理解 ThreadLocal</h1>
+                    
+                    
+                    <h2 class="subheading">Java 的线程封闭技术</h2>
+                    
+                    <span class="meta">Posted by Damon To on February 26, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>ThreadLocal 是 Java 并发领域里一个十分重要的类，本文将深入 ThreadLocal 这个类的具体含义与细节实现（基于 JDK8）。如果你之前没有接触或使用过 ThreadLocal ，那么推荐你先简单了解一下 ThreadLocal 的使用（推荐 @vigarbuaa 的 <a href="http://www.cnblogs.com/vigarbuaa/archive/2012/03/01/2375149.html">Java ThreadLocal示例及使用方法总结</a> 这篇博客），以及你需要了解一些关于 Java 并发的基础知识（推荐我的 <a href="http://splitmusic.cn/2018/02/05/java-concurrency-learning-1/">Java 并发学习笔记 (一)：并发基础知识</a> 一文）。希望本文对你有所帮助。</p>
+</blockquote>
+
+<h3 id="一-threadlocal-的定义与作用">(一) ThreadLocal 的定义与作用</h3>
+
+<p>学习 <code class="highlighter-rouge">ThreadLocal</code> 之前，最好明晰它处于 Java 开发体系的什么位置。<code class="highlighter-rouge">ThreadLocal</code> 类定义在 java / lang 中，但是其主要的应用是在于并发领域。<a href="https://book.douban.com/subject/10484692/">《 Java 并发编程实战》</a>中提到：</p>
+
+<blockquote>
+  <p>处理线程安全性问题的三种主要方式：</p>
+
+  <ol>
+    <li>不在线程之间共享该状态变量</li>
+    <li>将状态变量设置为不可变</li>
+    <li>在访问状态变量时使用同步</li>
+  </ol>
+</blockquote>
+
+<p><code class="highlighter-rouge">ThreadLocal</code> 在应该被归类于第一类技术：即通过<strong>线程封闭（Thread Confinement）</strong>技术，使得状态变量与特定的线程”绑定“起来（不在线程之间共享该状态变量），从而保证在多线程下的线程安全性。<a href="https://book.douban.com/subject/10484692/">《 Java 并发编程实战》</a>将线程封闭技术分为三种：Ad-hoc 线程封闭、栈封闭以及 <code class="highlighter-rouge">ThreadLocal</code> 。其中 <code class="highlighter-rouge">ThreadLocal</code> 是由 JDK 提供的、最易实现和维护且最为健壮的线程封闭技术。（具体请看 <a href="http://splitmusic.cn/2018/02/05/java-concurrency-learning-1/">Java 并发学习笔记 (一)：并发基础知识</a> 一文）</p>
+
+<h3 id="二-对-threadlocal-的整体了解与实现猜想">(二) 对 ThreadLocal 的整体了解与实现猜想</h3>
+
+<p>在了解 <code class="highlighter-rouge">ThreadLocal</code> 的具体实现之前，我们可以先通过对 <code class="highlighter-rouge">ThreadLocal</code> 源码结构的总体把握来大概了解 <code class="highlighter-rouge">ThreadLocal</code> 实现线程封闭的基本原理：</p>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/ThreadLocal-structure.jpg" width="400px" /></p>
+
+<p><code class="highlighter-rouge">ThreadLocal</code> 的作者在注释中如此介绍  <code class="highlighter-rouge">ThreadLocal</code> 的工作原理：</p>
+
+<blockquote>
+  <p>This class provides thread-local variables.  These variables differ from their normal counterparts in that each thread that accesses one (via its {@code get} or {@code set} method) has its own, independently initialized copy of the variable.  {@code ThreadLocal} instances are typically private static fields in classes that wish to associate state with a thread (e.g., a user ID or Transaction ID).</p>
+</blockquote>
+
+<p>大概告诉了我们几点信息：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">ThreadLocal</code> 为线程提供了一种特殊的”线程内部变量“（thread-local variables）。</li>
+  <li>线程通过 <code class="highlighter-rouge">ThreadLocal</code> 的 <code class="highlighter-rouge">get()</code> 和 <code class="highlighter-rouge">set()</code> 方法来获取一个变量副本，这个变量副本为该线程所独有。</li>
+  <li><code class="highlighter-rouge">ThreadLocal</code> 实例最好是一个 private static 修饰的字段。</li>
+</ul>
+
+<p>结合上面 <code class="highlighter-rouge">ThreadLocal</code>  的结构中，有一个名为 <code class="highlighter-rouge">ThreadLocalMap</code> 的内部类，<strong>我们可以大胆地对 <code class="highlighter-rouge">ThreadLocal</code> 的实现进行如下猜想：</strong></p>
+
+<p><code class="highlighter-rouge">ThreadLocal</code> 维护一个 <code class="highlighter-rouge">ThreadLocalMap</code> 的 key 为每个线程的 ThreadId，value 为我们需要封闭的线程内部变量。每次调用其 <code class="highlighter-rouge">get()</code> 和 <code class="highlighter-rouge">set()</code> ，以当前线程的 ThreadId 为 key 从  <code class="highlighter-rouge">ThreadLocalMap</code> 中定位到其对应的线程内部变量，从而实现不同线程之间的隔离。</p>
+
+<p>这种想法十分直接，事实上 JDK 早期的版本也是如此进行实现的，但是<strong>这种实现方法现在已经被摒弃</strong>。以下，我们尝试通过阅读 jdk8 源码中 <code class="highlighter-rouge">ThreadLocal</code> 的实现来了解这种实现方式为何被摒弃。</p>
+
+<h3 id="三-threadlocal-的实现细节">(三) ThreadLocal 的实现细节</h3>
+
+<h4 id="threadthreadlocalthreadlocalmap-的关系">Thread、ThreadLocal、ThreadLocalMap 的关系</h4>
+
+<p><code class="highlighter-rouge">ThreadLocal</code> 的一般使用步骤为：new 一个 <code class="highlighter-rouge">ThreadLocal</code> ，调用 <code class="highlighter-rouge">set()</code> 方法设置线程内部变量，需要变量时调用 <code class="highlighter-rouge">get()</code> 方法获取变量。那么我们就根据这个使用步骤来看看此时 <code class="highlighter-rouge">ThreadLocal</code>  内部的运作。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+* Creates a thread local variable.
+* @see #withInitial(java.util.function.Supplier)
+*/</span>
+<span class="kd">public</span> <span class="nf">ThreadLocal</span><span class="o">()</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">ThreadLocal</code> 只是简单的创建实例，没有做额外的初始化操作。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+* Sets the current thread's copy of this thread-local variable
+* to the specified value.  Most subclasses will have no need to
+* override this method, relying solely on the {@link #initialValue}
+* method to set the values of thread-locals.
+*
+* @param value the value to be stored in the current thread's copy of
+*        this thread-local.
+*/</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">T</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 获取当前线程</span>
+    <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+    <span class="c1">// 获取当前线程所维护的 ThreadLocalMap</span>
+    <span class="n">ThreadLocalMap</span> <span class="n">map</span> <span class="o">=</span> <span class="n">getMap</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">map</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="c1">// map 非空则取对象</span>
+    	<span class="n">map</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+    <span class="k">else</span>
+       	<span class="c1">// map 为空则创建 map 并进行相应的初始化</span>
+    	<span class="n">createMap</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>在 <code class="highlighter-rouge">set()</code> 方法的实现中我们已经可以看到这和我们之前的猜想不尽相同。在 JDK8 中， <code class="highlighter-rouge">ThreadLocal</code> 的基本实现思路是：每个 <code class="highlighter-rouge">Thread</code> 维护一个 <code class="highlighter-rouge">ThreadLocalMap</code> 实例， <code class="highlighter-rouge">ThreadLocalMap</code> 的 key 是 <code class="highlighter-rouge">ThreadLocal</code> 实例，value 是线程内部变量。访问线程内部变量时，先获取当前线程对应的  <code class="highlighter-rouge">ThreadLocalMap</code> ，再在该 <code class="highlighter-rouge">ThreadLocalMap</code>  中获取 <code class="highlighter-rouge">ThreadLocal</code> 对应的内部变量。</p>
+
+<p><strong>这种实现方式有何优点呢？</strong> 最大的优点应该是：当线程结束时， <code class="highlighter-rouge">ThreadLocalMap</code> 也会随之销毁，以避免对内存的占用。</p>
+
+<p>上述代码除了说明了 <code class="highlighter-rouge">ThreadLocal</code> 的基本实现，还说明了一个细节：每个 <code class="highlighter-rouge">Thread</code> 所对应的 <code class="highlighter-rouge">ThreadLocalMap</code> 是有可能为空的，也就是说线程不会在创建时就直接创建一个 <code class="highlighter-rouge">ThreadLocalMap</code> 并与之绑定，而是<strong>采取 JIT 策略，在需要使用 <code class="highlighter-rouge">ThreadLocalMap</code> 之前才绑定。</strong></p>
+
+<h4 id="threadlocalmap-的创建">ThreadLocalMap 的创建</h4>
+
+<p>这里继续看 <code class="highlighter-rouge">createMap()</code> 的具体实现和 <code class="highlighter-rouge">ThreadLocalMap</code> 的创建。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+* Create the map associated with a ThreadLocal. Overridden in
+* InheritableThreadLocal.
+*
+* @param t the current thread
+* @param firstValue value for the initial entry of the map
+*/</span>
+<span class="kt">void</span> <span class="nf">createMap</span><span class="o">(</span><span class="n">Thread</span> <span class="n">t</span><span class="o">,</span> <span class="n">T</span> <span class="n">firstValue</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 调用 ThreadLocalMap 的构造函数</span>
+	<span class="n">t</span><span class="o">.</span><span class="na">threadLocals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocalMap</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">firstValue</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">static</span> <span class="kd">class</span> <span class="nc">ThreadLocalMap</span> <span class="o">{</span>
+    
+    <span class="c1">//...省略了部分无关代码</span>
+    
+    <span class="cm">/**
+    * Construct a new map initially containing (firstKey, firstValue).
+    * ThreadLocalMaps are constructed lazily, so we only create
+    * one when we have at least one entry to put in it.
+    */</span>
+    <span class="n">ThreadLocalMap</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">firstKey</span><span class="o">,</span> <span class="n">Object</span> <span class="n">firstValue</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// map 的内部实际为一个 Entry 类型的数组，常量 INITIAL_CAPACITY 默认为 16</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">[</span><span class="n">INITIAL_CAPACITY</span><span class="o">];</span>
+        <span class="c1">// threadLocalHashCode 是优化后的哈希散列值，减少了碰撞的发生；&amp;运算使得 i 落在 0~15 之间</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstKey</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">INITIAL_CAPACITY</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span>
+        <span class="n">table</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">(</span><span class="n">firstKey</span><span class="o">,</span> <span class="n">firstValue</span><span class="o">);</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="n">setThreshold</span><span class="o">(</span><span class="n">INITIAL_CAPACITY</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="cm">/**
+         * Set the resize threshold to maintain at worst a 2/3 load factor.
+         */</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">setThreshold</span><span class="o">(</span><span class="kt">int</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">len</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><strong>读到这里，我们会有两个疑问：</strong></p>
+
+<ol>
+  <li><code class="highlighter-rouge">threadLocalHashCode</code> 是什么？它对哈希表进行了哪些优化？</li>
+  <li>如果 <code class="highlighter-rouge">size</code> 大于 <code class="highlighter-rouge">threshold</code> 时，如何处理？</li>
+</ol>
+
+<p>接下来的两部分我们分别关注这里提出的两个问题。</p>
+
+<h4 id="threadlocalhashcode-对哈希表进行的优化">threadLocalHashCode 对哈希表进行的优化</h4>
+
+<p>我们看回 <code class="highlighter-rouge">ThreadLocal</code> ：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+     * ThreadLocals rely on per-thread linear-probe hash maps attached
+     * to each thread (Thread.threadLocals and
+     * inheritableThreadLocals).  The ThreadLocal objects act as keys,
+     * searched via threadLocalHashCode.  This is a custom hash code
+     * (useful only within ThreadLocalMaps) that eliminates collisions
+     * in the common case where consecutively constructed ThreadLocals
+     * are used by the same threads, while remaining well-behaved in
+     * less common cases.
+     */</span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">threadLocalHashCode</span> <span class="o">=</span> <span class="n">nextHashCode</span><span class="o">();</span>
+
+<span class="cm">/**
+     * The next hash code to be given out. Updated atomically. Starts at
+     * zero.
+     */</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="n">AtomicInteger</span> <span class="n">nextHashCode</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nf">AtomicInteger</span><span class="o">();</span>
+
+<span class="cm">/**
+     * The difference between successively generated hash codes - turns
+     * implicit sequential thread-local IDs into near-optimally spread
+     * multiplicative hash values for power-of-two-sized tables.
+     */</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">HASH_INCREMENT</span> <span class="o">=</span> <span class="mh">0x61c88647</span><span class="o">;</span>
+
+<span class="cm">/**
+     * Returns the next hash code.
+     */</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">nextHashCode</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">nextHashCode</span><span class="o">.</span><span class="na">getAndAdd</span><span class="o">(</span><span class="n">HASH_INCREMENT</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">threadLocalHashCode</code> 以 <code class="highlighter-rouge">HASH_INCREMENT</code> 为增量，产生一组从 0、1 * HASH_INCREMENT、2 * HASH_INCREMENT…到 n * HASH_INCREMENT 的哈希散列值。在这里，HASH_INCREMENT 被设置为一个很特殊的十六进制数——「0x61c88647」。以这个数形成的散列称为斐波那契散列（Fibonacci Hashing）。斐波那契散列使得哈希表分布更加均匀，极大地减少了碰撞的发生，在实际运用中往往对效率有很大的提升。</p>
+
+<h4 id="threadlocalmap-的扩容">ThreadLocalMap 的扩容</h4>
+
+<p>如果 <code class="highlighter-rouge">size</code> 大于 <code class="highlighter-rouge">threshold</code> 时，最基本的想法是直接对 table 进行扩容，一般的做法就是 new 一个两倍大小的 table 并将原 table deep copy 到新的 table，<code class="highlighter-rouge">ThreadLocalMap</code>  提供了 <code class="highlighter-rouge">resize()</code> 方法：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+         * Double the capacity of the table.
+         */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">resize</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">[]</span> <span class="n">oldTab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">oldLen</span> <span class="o">=</span> <span class="n">oldTab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">newLen</span> <span class="o">=</span> <span class="n">oldLen</span> <span class="o">*</span> <span class="mi">2</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">[]</span> <span class="n">newTab</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">[</span><span class="n">newLen</span><span class="o">];</span>
+    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+    <span class="c1">// deep copy</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">oldLen</span><span class="o">;</span> <span class="o">++</span><span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">oldTab</span><span class="o">[</span><span class="n">j</span><span class="o">];</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// Help the GC</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="kt">int</span> <span class="n">h</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">newLen</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span>
+                <span class="k">while</span> <span class="o">(</span><span class="n">newTab</span><span class="o">[</span><span class="n">h</span><span class="o">]</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                    <span class="n">h</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="o">(</span><span class="n">h</span><span class="o">,</span> <span class="n">newLen</span><span class="o">);</span>
+                <span class="n">newTab</span><span class="o">[</span><span class="n">h</span><span class="o">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
+                <span class="n">count</span><span class="o">++;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="n">setThreshold</span><span class="o">(</span><span class="n">newLen</span><span class="o">);</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">count</span><span class="o">;</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">newTab</span><span class="o">;</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p>然而，更关键的问题在于：进行 <code class="highlighter-rouge">resize()</code> 的条件是什么？</p>
+
+<p>相比每次一达到 <code class="highlighter-rouge">threshold</code> 就进行 <code class="highlighter-rouge">resize()</code> ，如果我们对 <code class="highlighter-rouge">resize()</code> 的条件加以限制，尽可能地减少 <code class="highlighter-rouge">resize()</code> 的次数，则可以尽可能地优化性能。所以我们不妨看看 <code class="highlighter-rouge">set()</code> 是如何对这一条件进行限制的。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+         * Set the value associated with key.
+         *
+         * @param key the thread local object
+         * @param value the value to be set
+         */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="c1">// We don't use a fast path as with get() because it is at</span>
+    <span class="c1">// least as common to use set() to create new entries as</span>
+    <span class="c1">// it is to replace existing ones, in which case, a fast</span>
+    <span class="c1">// path would fail more often than not.</span>
+
+    <span class="n">Entry</span><span class="o">[]</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">threadLocalHashCode</span> <span class="o">&amp;</span> <span class="o">(</span><span class="n">len</span><span class="o">-</span><span class="mi">1</span><span class="o">);</span>
+
+    <span class="k">for</span> <span class="o">(</span><span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+         <span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+         <span class="c1">// 发生哈希碰撞，则储存在下一个 entry 中</span>
+         <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">len</span><span class="o">)])</span> <span class="o">{</span>
+        <span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">replaceStaleEntry</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+    <span class="kt">int</span> <span class="n">sz</span> <span class="o">=</span> <span class="o">++</span><span class="n">size</span><span class="o">;</span>
+    <span class="c1">// 需要满足 cleanSomeSlots(i, sz) 为 fales 且 sz &gt;= threshold 才进行 rehash()</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">cleanSomeSlots</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">sz</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">sz</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">)</span>
+        <span class="c1">// rehash() 方法调用了 resize()</span>
+        <span class="n">rehash</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">cleanSomeSlots(i, n)</code> 的主要作用是在哈希表中找到过期的项（stale entry）并将其擦除，以避免表空间被这些过期的项占用。stale entry 的产生很自然，当我们所保护的线程内部变量使用完毕，生命周期结束后则会被 GC 掉，这些 value 已被清除的 entry 则为 stale entry。</p>
+
+<p>需要注意的是在 <code class="highlighter-rouge">cleanSomeSlots()</code> 的实现（如下代码）中，出于对性能和时间复杂度的平衡， <code class="highlighter-rouge">cleanSomeSlots()</code> 并不是扫描 n 个 entry，而是扫描 log2(n) 个。虽然无法找出所有的 stale entry，但将时间复杂度从O(n) 降为 O(log2(n))。在实践中，这种平衡策略能提高效率，而且往往是够用的。</p>
+
+<p>另外，当 <code class="highlighter-rouge">set()</code> 调用  <code class="highlighter-rouge">cleanSomeSlots()</code>  时，参数 n 传入的是 <code class="highlighter-rouge">size</code> （即 entry 的个数）；如果在扫描过程中找到了 stale entry，n 的值会被 <code class="highlighter-rouge">cleanSomeSlots()</code> 为修改为 <code class="highlighter-rouge">length</code> （即 table 的总容量），即此时 <code class="highlighter-rouge">cleanSomeSlots()</code> 的扫描范围被扩大为整个表。采取这种实现的原因代码作者没有在注释中解释，但是从我的角度理解：这是一种从统计角度的优化。从 JVM 执行 GC 的角度来看，当 <code class="highlighter-rouge">ThreadLocalMap</code> 中发现了一个项因被 GC 而过期，那么此时往往存在多个项也是过期的，所以在此时扩大扫描范围，有更大的概率找到更多的 stale entry ，从而提高 <code class="highlighter-rouge">cleanSomeSlots()</code> 的效率。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+         * Heuristically scan some cells looking for stale entries.
+         * This is invoked when either a new element is added, or
+         * another stale one has been expunged. It performs a
+         * logarithmic number of scans, as a balance between no
+         * scanning (fast but retains garbage) and a number of scans
+         * proportional to number of elements, that would find all
+         * garbage but would cause some insertions to take O(n) time.
+         *
+         * @param i a position known NOT to hold a stale entry. The
+         * scan starts at the element after i.
+         *
+         * @param n scan control: {@code log2(n)} cells are scanned,
+         * unless a stale entry is found, in which case
+         * {@code log2(table.length)-1} additional cells are scanned.
+         * When called from insertions, this parameter is the number
+         * of elements, but when from replaceStaleEntry, it is the
+         * table length. (Note: all this could be changed to be either
+         * more or less aggressive by weighting n instead of just
+         * using straight log n. But this version is simple, fast, and
+         * seems to work well.)
+         *
+         * @return true if any stale entries have been removed.
+         */</span>
+<span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">cleanSomeSlots</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">removed</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">[]</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="k">do</span> <span class="o">{</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
+        <span class="n">Entry</span> <span class="n">e</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+        <span class="c1">// 符合该 if 条件的则为 stale entry，将其擦除</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">e</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">len</span><span class="o">;</span>
+            <span class="n">removed</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">expungeStaleEntry</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="c1">// 无符号右移一位并赋值，所以最终循环 log2(n) 次</span>
+    <span class="o">}</span> <span class="k">while</span> <span class="o">(</span> <span class="o">(</span><span class="n">n</span> <span class="o">&gt;&gt;&gt;=</span> <span class="mi">1</span><span class="o">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">removed</span><span class="o">;</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p>除了在 <code class="highlighter-rouge">set()</code> 限制进行 <code class="highlighter-rouge">resize()</code> 的条件，在 <code class="highlighter-rouge">set()</code> 通过 <code class="highlighter-rouge">rehash()</code> 调用  <code class="highlighter-rouge">resize()</code> 过程中， <code class="highlighter-rouge">rehash()</code> 又做了进一步地限制：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+         * Re-pack and/or re-size the table. First scan the entire
+         * table removing stale entries. If this doesn't sufficiently
+         * shrink the size of the table, double the table size.
+         */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">rehash</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// expunge all stale entry</span>
+    <span class="n">expungeStaleEntries</span><span class="o">();</span>
+
+    <span class="c1">// Use lower threshold for doubling to avoid hysteresis</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="n">threshold</span> <span class="o">-</span> <span class="n">threshold</span> <span class="o">/</span> <span class="mi">4</span><span class="o">)</span>
+        <span class="n">resize</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">rehash()</code> 进行限制的原理与 <code class="highlighter-rouge">set()</code> 的实现异曲同工，但扫描程度更完全。之前说过 <code class="highlighter-rouge">cleanSomeSlots()</code> 只会扫描范围内的 log2(n) 个 entry，而 <code class="highlighter-rouge">expungeStaleEntries()</code> 会扫描范围内所有的 entry。<strong>总之，<code class="highlighter-rouge">ThreadLocalMap</code> 通过种种手段，保证了只有当哈希表中完全没有过期的项时才有可能进行扩容。</strong></p>
+
+<h4 id="总结-threadlocal-的实现">总结 ThreadLocal 的实现</h4>
+
+<p>至此，我们从 <code class="highlighter-rouge">TreadLocal.set()</code> 开始，了解了 <code class="highlighter-rouge">TreadLocalMap()</code> 、 <code class="highlighter-rouge">TreadLocalMap.set()</code> 、 <code class="highlighter-rouge">cleanSomeSlots()</code> 、 <code class="highlighter-rouge">expungeStaleEntries()</code>  ，基本理清了从创建 <code class="highlighter-rouge">ThreadLocal</code> 到进行 <code class="highlighter-rouge">set()</code> 时 <code class="highlighter-rouge">ThreadLocal</code> 的内部实现，包括了：Thread、TreadLocal、TreadLocalMap 三者的关系；TreadLocalMap 的创建；TreadLocalMap 为减少碰撞对哈希表的优化；TreadLocalMap 的扩容和对应的优化。</p>
+
+<p>至于 <code class="highlighter-rouge">get()</code> 的理解相信在理解了 <code class="highlighter-rouge">set()</code> 之后就相对比较简单，所以这里就不再赘述。</p>
+
+<p>###(四) ThreadLocal 会导致内存泄漏？</p>
+
+<p>有一些观点认为，使用 <code class="highlighter-rouge">ThreadLocal</code> 可能会导致内存泄漏，原因基于以下的事实：</p>
+
+<p>在 <code class="highlighter-rouge">ThreadLocalMap</code> 的实现中， <code class="highlighter-rouge">Entry</code> 继承了 <code class="highlighter-rouge">WeakReference</code>（即弱引用），如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+         * The entries in this hash map extend WeakReference, using
+         * its main ref field as the key (which is always a
+         * ThreadLocal object).  Note that null keys (i.e. entry.get()
+         * == null) mean that the key is no longer referenced, so the
+         * entry can be expunged from table.  Such entries are referred to
+         * as "stale entries" in the code that follows.
+         */</span>
+<span class="kd">static</span> <span class="kd">class</span> <span class="nc">Entry</span> <span class="kd">extends</span> <span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;&gt;</span> <span class="o">{</span>
+    <span class="cm">/** The value associated with this ThreadLocal. */</span>
+    <span class="n">Object</span> <span class="n">value</span><span class="o">;</span>
+
+    <span class="n">Entry</span><span class="o">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span> <span class="n">k</span><span class="o">,</span> <span class="n">Object</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">k</span><span class="o">);</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">v</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>用实线代表强引用，虚线代表弱引用，那么使用 ThreadLocal 时对象在 JVM 内存中如下分布：</p>
+
+<p><img src="http://ompnv884d.bkt.clouddn.com/ThreadLocal-WeakRef.png" /></p>
+
+<p>假设强引用不存在了，那么 GC 时 <code class="highlighter-rouge">ThreadLocal</code> 对象由于只有弱引用所以会被回收，那么 key 就会变为 <code class="highlighter-rouge">null</code> ，意味着其对应的 value 将永远无法被调用到，导致内存泄漏。然而 JDK 设计者也意识到这个问题，所以也采取了一定的措施避免这种问题出现。例如在 <code class="highlighter-rouge">resize()</code> 中有这样一段代码：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// Help the GC</span>
+<span class="o">}</span> 
+</code></pre></div></div>
+
+<p>类似的代码不止一处，其实在 <code class="highlighter-rouge">ThreadLocalMap</code> 中，只要涉及到扫描 Entry 的方法，都会检查其 key 是否为空，如若为空都会及时清除 value 以避免内存泄漏。类似的代码几乎遍布于 <code class="highlighter-rouge">ThreadLocalMap</code> 的方法实现之中（感兴趣的可以找来源码看看有多少方法加入了类似的代码）。所以说，内存泄漏在实际使用 <code class="highlighter-rouge">ThreadLocal</code> 时虽有可能出现，但我们也不用对此过于担心。同时，为了最大化的保证安全性，我们也可以在调用 <code class="highlighter-rouge">remove()</code> 来保证当前线程的所有内部变量都被销毁。</p>
+
+<h3 id="五-总结">(五) 总结</h3>
+
+<p>了解完 <code class="highlighter-rouge">ThreadLocal</code> 的实现，其实我们发现：本质上， <code class="highlighter-rouge">ThreadLocal</code> 类是通过 OOP 的封装思想，实现了变量的线程封闭。虽然思想是简单直接的，但是具体实现中却是有很多细节上的心思：例如 Thread、ThreadLocal、ThreadLocalMap 三个类关系的处理，例如对扩容操作的逐步限制以优化性能，例如对内存泄漏的避免….这些都很值得我们在实际开发中学习与借鉴。</p>
+
+<hr />
+
+<p><em>参考资料：</em></p>
+
+<ol>
+  <li><em>JAVA 并发 - 自问自答学 ThreadLocal：<a href="https://juejin.im/post/5a0e985df265da430e4ebb92">https://juejin.im/post/5a0e985df265da430e4ebb92</a></em></li>
+  <li><em>ThreadLocal源码分析解密  - By 谢照东：<a href="http://xiezhaodong.me/2016/03/05/ThreadLocal%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E8%A7%A3%E5%AF%86/">http://xiezhaodong.me/2016/03/05/ThreadLocal%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E8%A7%A3%E5%AF%86/</a></em></li>
+  <li><em>ThreadLocal和 synchronized的区别 ? - 知乎用户的回答 - 知乎：<a href="https://www.zhihu.com/question/23089780/answer/62097840">https://www.zhihu.com/question/23089780/answer/62097840</a></em></li>
+  <li><em>Java ThreadLocal 示例及使用方法总结：<a href="http://www.cnblogs.com/vigarbuaa/archive/2012/03/01/2375149.html">http://www.cnblogs.com/vigarbuaa/archive/2012/03/01/2375149.html</a></em></li>
+  <li><em>Github - lambdalab-mirror/jdk8u-jdk：<a href="https://github.com/lambdalab-mirror/jdk8u-jdk/">https://github.com/lambdalab-mirror/jdk8u-jdk/</a></em></li>
+</ol>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/02/13/java-concurrency-learning-4/" data-toggle="tooltip" data-placement="top" title=" Java 并发学习笔记(四)">
+                        Previous<br>
+                        <span> Java 并发学习笔记(四)</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/03/03/java-web-2/" data-toggle="tooltip" data-placement="top" title="Java Web 开发(二)：配置 SSM 框架">
+                        Next<br>
+                        <span>Java Web 开发(二)：配置 SSM 框架</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Unity3D" title="Unity3D" rel="5">
+                                    Unity3D
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Java" title="Java" rel="12">
+                                    Java
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Java Web" title="Java Web" rel="2">
+                                    Java Web
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Concurrency" title="Concurrency" rel="5">
+                                    Concurrency
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#JDK" title="JDK" rel="2">
+                                    JDK
+                                </a>
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Spring" title="Spring" rel="2">
+                                    Spring
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "damon-to";
+    var disqus_identifier = "/2018/02/26/jdk-reading-1";
+    var disqus_url = "https://damondu.github.io//2018/02/26/jdk-reading-1/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/damon_to">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/splitmusic">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/DamonDu">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; SplitMusic 2018
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Service Worker -->
+
+<script type="text/javascript">
+    if(navigator.serviceWorker){
+        // For security reasons, a service worker can only control the pages that are in the same directory level or below it. That's why we put sw.js at ROOT level.
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {console.log('Service Worker Registered. ', registration)})
+            .catch((error) => {console.log('ServiceWorker registration failed: ', error)})
+    }
+</script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/ 
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers   
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async('/js/jquery.tagcloud.js',function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
