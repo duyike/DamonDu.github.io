@@ -4,6 +4,7 @@ title:      "互联网角落的「Soulmate」"
 subtitle:   "由 Soul 引发的一些思考"
 date:       2018-09-12 07:00:00
 author:     "Damon To"
+header-style: text
 catalog:    true
 tags:
     - 产品
