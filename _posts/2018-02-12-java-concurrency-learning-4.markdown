@@ -4,8 +4,7 @@ title:      " Java 并发学习笔记(四)"
 subtitle:   "高级主题"
 date:       2018-2-12 23:30:00
 author:     "Damon To"
-header-img: "img/java-concurrency.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Java

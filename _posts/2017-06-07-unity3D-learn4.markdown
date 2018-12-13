@@ -4,8 +4,7 @@ title:      "Unity3D开发(四):射箭小游戏"
 subtitle:   "碰撞器＆触发器"
 date:       2017-06-07 12:00:00
 author:     "Damon To"
-header-img: "img/unity-bg2.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Unity3D

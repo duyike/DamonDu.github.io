@@ -4,8 +4,7 @@ title:      "Java 沉思录(一)：自动装箱实现细节"
 subtitle:   "装箱时 Java 做了什么？"
 date:       2017-11-02 02:50:00
 author:     "Damon To"
-header-img: "img/ruminations-java.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Java

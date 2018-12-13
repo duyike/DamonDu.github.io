@@ -4,8 +4,7 @@ title:      "Java 沉思录(二)：关于 String"
 subtitle:   "从源码角度分析"
 date:       2018-03-13 03:25:00
 author:     "Damon To"
-header-img: "img/ruminations-java.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Java

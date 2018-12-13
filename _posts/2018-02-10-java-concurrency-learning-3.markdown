@@ -4,8 +4,7 @@ title:      " Java 并发学习笔记(三)"
 subtitle:   "活跃性、性能与测试"
 date:       2018-2-10 18:00:00
 author:     "Damon To"
-header-img: "img/java-concurrency.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Java

@@ -4,8 +4,7 @@ title:      "深入理解Java虚拟机(三)"
 subtitle:   "程序编译与代码优化"
 date:       2017-12-18 22:00:00
 author:     "Damon To"
-header-img: "img/java-virtual-machine.jpeg"
-header-mask: 0.5
+header-style: text
 catalog:    true
 tags:
     - Java

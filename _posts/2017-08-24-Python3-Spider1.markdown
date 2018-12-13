@@ -4,8 +4,7 @@ title:      "Python3爬虫实战(一):requests+正则爬取音乐网站Allmusic"
 subtitle:   "立个Flag: 不爬妹子图"
 date:       2017-08-24 23:30:00
 author:     "Damon To"
-header-img: "img/spider-bg1.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Python

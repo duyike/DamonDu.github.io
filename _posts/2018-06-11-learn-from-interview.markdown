@@ -4,8 +4,7 @@ title:      "项目总结：近期的两个小项目"
 subtitle:   "Learn from interview"
 date:       2018-06-11 16:25:00
 author:     "Damon To"
-header-img: "img/learn-from-interview.jpg"
-header-mask: 0.3
+header-style: text
 catalog:    true
 tags:
     - NIO

@@ -4,8 +4,7 @@ title:      "Unity3D开发(五):DOTween 插件仿写"
 subtitle:   "造轮子从仿造开始"
 date:       2017-06-08 13:00:00
 author:     "Damon To"
-header-img: "img/unity-bg.jpg"
-header-mask: 0.3
+header-style: text
 catalog:    true
 tags:
     - Unity3D

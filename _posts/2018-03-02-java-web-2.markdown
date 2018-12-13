@@ -4,8 +4,7 @@ title:      "Java Web 开发(二)：配置 SSM 框架"
 subtitle:   "spring + SpringMVC + MyBatis"
 date:       2018-03-02 21:00:00
 author:     "Damon To"
-header-img: "img/java-web-2.jpeg"
-header-mask: 0.4
+header-style: text
 catalog:    true
 tags:
     - Java

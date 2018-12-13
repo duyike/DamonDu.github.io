@@ -4,8 +4,7 @@ title:      "JDK 源码阅读(一)：理解 ThreadLocal"
 subtitle:   "Java 的线程封闭技术"
 date:       2018-02-25 22:40:00
 author:     "Damon To"
-header-img: "img/jdk-threadlocal.jpg"
-header-mask: 0.4
+header-style: text
 catalog:    true
 tags:
     - Java

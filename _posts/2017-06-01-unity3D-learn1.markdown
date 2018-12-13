@@ -4,8 +4,7 @@ title:      "Unity3D开发(一)：恶魔与牧师小游戏"
 subtitle:   "上手MVC架构"
 date:       2017-06-01 01:50:00
 author:     "Damon To"
-header-img: "img/unity-bg.jpg"
-header-mask: 0.6
+header-style: text
 catalog:    true
 tags:
     - Unity3D

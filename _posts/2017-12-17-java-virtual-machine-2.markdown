@@ -4,8 +4,7 @@ title:      "深入理解Java虚拟机(二)"
 subtitle:   "虚拟机执行子系统"
 date:       2017-12-17 23:30:00
 author:     "Damon To"
-header-img: "img/java-virtual-machine.jpeg"
-header-mask: 0.5
+header-style: text
 catalog:    true
 tags:
     - Java
@@ -82,9 +81,9 @@ tags:
 - 接口加载与类加载的不同：第 3 种主动引用，**接口初始化时，不要求其父接口全部都完成了初始化**
 - **区分类加载/加载：**类加载包含：加载、验证、准备、解析、初始化 5 个步骤；加载是类加载的一个阶段
 - **加载阶段**，虚拟机需要完成 3 件事：
-  1. 通过类的全限定名来获取定义类的二进制字节流
+  1. 通过类的全限定名来获取定义类的二进制字节流目标
   2. 将字节流所代表的静态存储结构转化为方法区的运行时数据结构
-  3. 在内存中生成类的 java,lang.Class 对象，作为方法区这个类的各种数据的访问入口
+  3. 在内存中生成类的 java.lang.Class 对象，作为方法区这个类的各种数据的访问入口
 - **非数组类的加载**，可以使用系统提供的引导类加载器来完成，也可以用用户自定义的类加载器完成；**数组类的加载**，由 Java 虚拟机直接创建
 - **元素类型（Element Type）VS 组件类型（Component Type）**
   - 元素类型：数组去掉所有维度的类型
@@ -114,7 +113,7 @@ tags:
 - 类加载器一般分三种：
   - 启动类加载器（Bootstrap ClassLoader）：加载其他的所有类加载器
   - 扩展类加载其（Extension ClassLoader）：加载 \<JAVA_HOME>\lib\ext 中的，或者被 java.ext.dirs 指定的路径中的所有类库
-  - 应用程序类加载器（Application ClassLoader）：架子用户类路径上所指定的类库
+  - 应用程序类加载器（Application ClassLoader）：加载用户类路径上所指定的类库
 - **双亲委派模型（Parents Delegation Model）：**除了顶层的启动类加载器外，其余的类加载器都应当有自己的父类加载器。
   - 这里的父子关系不是以继承（Inheritance）实现而是使用组合（Composition）来复用父加载器的代码
   - 只有当父加载器无法完成加载请求时，子加载器才会尝试自己加载（优先级：父加载器 > 子加载器）

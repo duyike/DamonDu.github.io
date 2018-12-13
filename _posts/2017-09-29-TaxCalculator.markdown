@@ -4,8 +4,7 @@ title:      "Java Web 开发(一)：简易税务计算器"
 subtitle:   "—— 基于 Java + JS 实现"
 date:       2017-09-29 13:35:00
 author:     "Damon To"
-header-img: "img/TaxCalculator.jpg"
-header-mask: 0.5
+header-style: text
 catalog:    true
 tags:
     - Java

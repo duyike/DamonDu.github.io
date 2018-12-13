@@ -4,8 +4,7 @@ title:      "深入理解Java虚拟机(一)"
 subtitle:   "自动内存管理机制"
 date:       2017-12-13 23:00:00
 author:     "Damon To"
-header-img: "img/java-virtual-machine.jpeg"
-header-mask: 0.5
+header-style: text
 catalog:    true
 tags:
     - Java

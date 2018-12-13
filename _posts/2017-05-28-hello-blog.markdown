@@ -4,8 +4,7 @@ title:      "Hello SplitMusic"
 subtitle:   "hello blog"
 date:       2017-05-28 00:50:00
 author:     "Damon To"
-header-img: "img/about-bg.jpg"
-header-mask: 0.3
+header-style: text
 catalog:    true
 tags:
     - 闲谈
