@@ -50,7 +50,7 @@ tags:
 
 * **对象创建过程：**
 
-  ![](../img/in-post/2017-12-13-java-virtual-machine-1/对象创建.png)
+  ![](/img/in-post/2017-12-13-java-virtual-machine-1/对象创建.png)
 
 * 为对象分配内存时，选择哪种分配方式取决于内存是否规整，内存是否规整取决于垃圾收集器是否有整理功能
 
@@ -171,4 +171,4 @@ tags:
 
   5. 空间分配担保：
 
-     ![](../img/in-post/2017-12-13-java-virtual-machine-1/空间分配担保.png)
+     ![](/img/in-post/2017-12-13-java-virtual-machine-1/空间分配担保.png)

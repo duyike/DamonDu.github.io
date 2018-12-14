@@ -84,7 +84,7 @@ tags:
 
 * **Amdahl 定律**：在增加计算资源的情况下，程序在理论上能够实现最高加速比，这个值取决于程序中可并行组件与串行组件所占的比重。假定 F 是必须被串行执行的部分，那么根据 Amdahl 定律，在包含 Ⅳ 个处理器的机器中，最高的加速比为：
 
-  ![](../img/in-post/2018-02-10-java-concurrency-learning-3/Amdahl 定律.png)
+  ![](/img/in-post/2018-02-10-java-concurrency-learning-3/Amdahl 定律.png)
 
 * 在所有的并发程序中都包含一些串行部分。
 

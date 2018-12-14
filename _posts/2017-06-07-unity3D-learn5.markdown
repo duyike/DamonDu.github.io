@@ -24,7 +24,7 @@ tags:
 
 ## 效果展示
 
-![](../img/in-post/2017-06-07-unity3D-learn5/DOTween.gif)
+![](/img/in-post/2017-06-07-unity3D-learn5/DOTween.gif)
 
 ## 开发过程
 

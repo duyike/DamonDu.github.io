@@ -28,7 +28,7 @@ tags:
 
 - **javac 编译过程：**
 
-  ![](../img/in-post/2017-12-18-java-virtual-machine-3/javac编译过程.png)
+  ![](/img/in-post/2017-12-18-java-virtual-machine-3/javac编译过程.png)
 
 - **解析与填充符号表过程：**
 
@@ -84,7 +84,7 @@ tags:
 
 - **方法调用计数器触发的即时编译：**
 
-  ![](../img/in-post/2017-12-18-java-virtual-machine-3/方法调用计数器触发的即时编译.png)
+  ![](/img/in-post/2017-12-18-java-virtual-machine-3/方法调用计数器触发的即时编译.png)
 
 - 如果不做任何设置，方法调用计数器统计的是相对的执行频率，即一段时间内的调用次数。如果一定时间内，方法的调用次数没有达到阈值，那计数器值就会减少一半，这个过程称为**衰减（Counter Decay）**
 
@@ -95,7 +95,7 @@ tags:
 
 - **回边计数器触发的即时编译：**
 
-  ![](../img/in-post/2017-12-18-java-virtual-machine-3/回边计数器触发的即时编译.png)
+  ![](/img/in-post/2017-12-18-java-virtual-machine-3/回边计数器触发的即时编译.png)
 
 - 回边计数器统计的是绝对次数，不存在热度衰减的过程
 
@@ -117,7 +117,7 @@ tags:
 
 - **Java 编译器内联：**
 
-  ![](../img/in-post/2017-12-18-java-virtual-machine-3/Java编译器内联.png)
+  ![](/img/in-post/2017-12-18-java-virtual-machine-3/Java编译器内联.png)
 
 - **逃逸分析（Escape Analysis）**主要分析对象的动态作用域，分两种：
 

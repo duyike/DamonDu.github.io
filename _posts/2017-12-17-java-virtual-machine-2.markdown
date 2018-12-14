@@ -145,7 +145,7 @@ tags:
 
 - **invokevirtual 指令的运行时解析过程：**
 
-  ![](../img/in-post/2017-12-17-java-virtual-machine-2/invokevirtual 指令的运行时解析过程.png)
+  ![](/img/in-post/2017-12-17-java-virtual-machine-2/invokevirtual 指令的运行时解析过程.png)
 
 - **单分派/多分派：**方法的接收者与方法的参数统称为方法的宗量。单分派根据一个宗量对目标方法进行选择，多分派根据多个宗量对目标方法进行选择
 
