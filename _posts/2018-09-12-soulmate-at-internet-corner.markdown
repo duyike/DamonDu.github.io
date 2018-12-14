@@ -16,7 +16,7 @@ tags:
 
 Soul 是一款主打**性格测试+算法推荐**的陌生人交友 APP，其主体功能——「心灵社交」的逻辑也足够简单：首先，用户首次进入时进行一次简单的”灵魂测试“；接着，依据测试结果，每个用户会落在不同的”星球“上；最后，当用户点击”Matching“进行系统匹配时，系统结合用户所在“星球”和其他性格特征来匹配“合拍度”高的其他用户。通过将 ”用户调研→生成用户画像→算法推荐“ 的流程进行了形象化地封装，再加上适度的引导，Soul 很大程度地抹除了用户对流程的天然反感，也契合产品自身的调性。
 
-![](http://ompnv884d.bkt.clouddn.com/soul_use_logic.png)
+![](../img/in-post/2018-09-12-soulmate-at-internet-corner/soul_use_logic.png)
 
 <center>    
 	<div style="color:orange; border-bottom: 1px solid #d9d9d9;display: inline-block;     color: #999;padding: 1px;">一次「心灵社交」的简要流程</div> 
@@ -34,7 +34,7 @@ Soul 固然有许多亮点：它开辟了社交的另一种玩法，没有走基
 
 虽然 Soul 的运营现状算是稳中有升，但也一直处于一个不温不火的尴尬状态。它虽然有超过 40% 的次月留存率，但 DAU 却长期维持在三四十万的数量[^1]，可见其鼓吹的「心灵社交」并没能受到所有用户的买单。它另类的定位和小众的风格一方面缩小了目标受众的范围，另一方面让忠实用户得以圈地自萌。这种忠实用户的圈地维持着它可观的留存率的同时，也提高了新用户进入的门槛。
 
-![](http://ompnv884d.bkt.clouddn.com/soul_dau.png)
+![](../img/in-post/2018-09-12-soulmate-at-internet-corner/soul_dau.png)
 
 <center>    
 	<div style="color:orange; border-bottom: 1px solid #d9d9d9;display: inline-block;     color: #999;padding: 1px;">Soul 日活跃用户数量趋势分析</div> 
@@ -46,7 +46,7 @@ Soul 应该在产品与社区中强化对新用户的引导和体验保护。我
 
 **我认为「时间轴」这个功能是可以做删减。**「时间轴」的初衷可以理解为为用户提供一个初步了解的入口，帮助陌生用户之间的“破冰”。但实际上，这个功能让用户形成了“先看动态再聊天”的用户习惯。而从社交心理的角度，未知的人与事更能引发我们的兴趣。将过于“具体”的「时间轴」更改成模糊且有限的用户画像描述，或许更能诱发聊天的产生，同时也避免了给新用户带来体验上的落差。
 
-![](http://ompnv884d.bkt.clouddn.com/soul_timeline.png)
+![](../img/in-post/2018-09-12-soulmate-at-internet-corner/soul_timeline.png)
 
 <center>    
 	<div style="color:orange; border-bottom: 1px solid #d9d9d9;display: inline-block;     color: #999;padding: 1px;">模糊化的用户描述是否更能引起聊天欲望？</div> 

@@ -21,10 +21,6 @@ tags:
 - 若玩家分数低于或等于0分时，游戏失败。
 - 玩家分数每达到一定分数（20分、40分等），则关卡升级。发射飞碟数量增多，发射速度加快。
 
-## 游戏展示
-
-![](http://ompnv884d.bkt.clouddn.com/Disk.gif)
-
 ## 设计思路
 
 ​	这次游戏设计继续采用MVC架构，根据自顶向下的设计思路，我首先考虑最顶层的控制类`GameScenceController`，它应该以**单实例**形式存在，并且通过对其它类提供功能不同的接口来实现向类转达信息。所以从功能考虑，`GameScenceController`实现了`IUserInterface`（用户操作接口）, `IQueryStatus`（状态查询接口）, `setStatus`（状态设置接口）, `IScore`（分数相关功能接口），这样我们就完成了`Control`层的设计。

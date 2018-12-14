@@ -35,10 +35,6 @@ tags:
 >
 > 操作方法：点击植物或僵尸使其上船，点击GO按键使船移动。
 
-​	游戏效果：
-
-![](http://ompnv884d.bkt.clouddn.com/GAME.gif-1)
-
 ## 参考资料
 
 ​	Simba_Scorpio的博客文章：http://blog.csdn.net/simba_scorpio/article/details/50846520
@@ -49,11 +45,7 @@ tags:
 
 ## 游戏架构
 
-​	游戏采用MVC架构来设计，主要目录如下：
-
-![](http://ompnv884d.bkt.clouddn.com/%E6%8D%95%E8%8E%B73.JPG)
-
-​	其中`GameSceneController`为控制类，负责生成以及控制所有游戏对象；`SenceModel`和`PersonModel`为模型类，主要负责整体和局部的逻辑实现；`Person`与`GoClick`为用户接口类，主要实现每个游戏精灵以及GO按钮的用户交互。
+​	游戏采用MVC架构来设计，其中`GameSceneController`为控制类，负责生成以及控制所有游戏对象；`SenceModel`和`PersonModel`为模型类，主要负责整体和局部的逻辑实现；`Person`与`GoClick`为用户接口类，主要实现每个游戏精灵以及GO按钮的用户交互。
 
 ## 重点展示
 

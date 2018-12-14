@@ -16,9 +16,7 @@ tags:
 
 ## 项目简介
 
-Tax Calculator：一个基于 Java + Javascript 实现的个人税务计算器。基本功能是：输入收入、计算并输出应缴税金、修改税务计算规则等。操作说明如下图：
-
-![](http://ompnv884d.bkt.clouddn.com/PersonalTax.JPG-default)
+Tax Calculator：一个基于 Java + Javascript 实现的个人税务计算器。基本功能是：输入收入、计算并输出应缴税金、修改税务计算规则等。
 
 * 开发环境： JRE 1.8.0_131 (Win 10)
 * 技术栈：
@@ -31,7 +29,7 @@ Tax Calculator：一个基于 Java + Javascript 实现的个人税务计算器�
 
 项目架构如下 UML 图所示：
 
-![](http://ompnv884d.bkt.clouddn.com/rear-end-UML.jpg)
+![](../img/in-post/2017-09-29-TaxCalculator/rear-end-UML.jpg)
 
 UML图中省略了 Web UI 的具体实现。其中需要注意的：
 

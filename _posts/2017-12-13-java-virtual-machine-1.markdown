@@ -50,7 +50,7 @@ tags:
 
 * **对象创建过程：**
 
-  ![对象创建](http://ompnv884d.bkt.clouddn.com/%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA.png)
+  ![](../img/in-post/2017-12-13-java-virtual-machine-1/对象创建.png)
 
 * 为对象分配内存时，选择哪种分配方式取决于内存是否规整，内存是否规整取决于垃圾收集器是否有整理功能
 
@@ -171,4 +171,4 @@ tags:
 
   5. 空间分配担保：
 
-     ![空间分配担保](http://ompnv884d.bkt.clouddn.com/%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D%E6%8B%85%E4%BF%9D.png)
+     ![](../img/in-post/2017-12-13-java-virtual-machine-1/空间分配担保.png)

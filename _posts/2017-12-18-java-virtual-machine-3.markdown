@@ -28,7 +28,7 @@ tags:
 
 - **javac 编译过程：**
 
-  ![javac编译过程](http://ompnv884d.bkt.clouddn.com/javac%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B.png)
+  ![](../img/in-post/2017-12-18-java-virtual-machine-3/javac编译过程.png)
 
 - **解析与填充符号表过程：**
 
@@ -84,7 +84,7 @@ tags:
 
 - **方法调用计数器触发的即时编译：**
 
-  ![方法调用计数器触发的即时编译](http://ompnv884d.bkt.clouddn.com/%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E8%AE%A1%E6%95%B0%E5%99%A8%E8%A7%A6%E5%8F%91%E7%9A%84%E5%8D%B3%E6%97%B6%E7%BC%96%E8%AF%91.png)
+  ![](../img/in-post/2017-12-18-java-virtual-machine-3/方法调用计数器触发的即时编译.png)
 
 - 如果不做任何设置，方法调用计数器统计的是相对的执行频率，即一段时间内的调用次数。如果一定时间内，方法的调用次数没有达到阈值，那计数器值就会减少一半，这个过程称为**衰减（Counter Decay）**
 
@@ -95,7 +95,7 @@ tags:
 
 - **回边计数器触发的即时编译：**
 
-  ![回边计数器触发的即时编译](http://ompnv884d.bkt.clouddn.com/%E5%9B%9E%E8%BE%B9%E8%AE%A1%E6%95%B0%E5%99%A8%E8%A7%A6%E5%8F%91%E7%9A%84%E5%8D%B3%E6%97%B6%E7%BC%96%E8%AF%91.png)
+  ![](../img/in-post/2017-12-18-java-virtual-machine-3/回边计数器触发的即时编译.png)
 
 - 回边计数器统计的是绝对次数，不存在热度衰减的过程
 
@@ -117,7 +117,7 @@ tags:
 
 - **Java 编译器内联：**
 
-  ![Java编译器内联](http://ompnv884d.bkt.clouddn.com/Java%E7%BC%96%E8%AF%91%E5%99%A8%E5%86%85%E8%81%94.png)
+  ![](../img/in-post/2017-12-18-java-virtual-machine-3/Java编译器内联.png)
 
 - **逃逸分析（Escape Analysis）**主要分析对象的动态作用域，分两种：
 

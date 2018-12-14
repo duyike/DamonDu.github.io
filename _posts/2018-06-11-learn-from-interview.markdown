@@ -21,7 +21,7 @@ tags:
 
 #### 项目基本架构
 
-![](http://ompnv884d.bkt.clouddn.com/nio-aarchitecture.png)
+![](../img/in-post/2018-06-11-learn-from-interview/nio-aarchitecture.png)
 
 #### Java BIO/NIO/AIO
 
@@ -51,7 +51,7 @@ Java AIO（在 JDK 1.7 中也称为 NIO.2），在性能上相较于 NIO 并没�
 
 * HTTP 报文格式：
 
-  ![](http://ompnv884d.bkt.clouddn.com/Http-format.png)
+  ![](../img/in-post/2018-06-11-learn-from-interview/Http-format.png)
 
 * HTTP Method 有哪些？
 
@@ -82,7 +82,7 @@ Java AIO（在 JDK 1.7 中也称为 NIO.2），在性能上相较于 NIO 并没�
 
 #### Oauth 验证流程
 
-![](http://ompnv884d.bkt.clouddn.com/springbootwebsocket.png)
+![](../img/in-post/2018-06-11-learn-from-interview/springbootwebsocket.png)
 
 #### Websocket 协议
 

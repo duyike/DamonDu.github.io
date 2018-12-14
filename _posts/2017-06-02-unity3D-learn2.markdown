@@ -19,12 +19,6 @@ tags:
 - 点击地面后，出现一个圆形攻击标记，两秒后自动消失。注意：该攻击标记不能挡住点击。（Primitive Objects / Cylinder）
 - 请使用一个简单工厂创建、管理这些的标记，并自动收回这些标记（注意，这些对象创建后，放在列表内，不必释放）。
 
-## 效果展示
-
-![](http://ompnv884d.bkt.clouddn.com/Easy%20Factory%20Method.gif)
-
-
-
 ## 实现过程
 
 ​	完整代码地址: [GitHub - DamonDu/Unity3D_Training/Easy Factory Method](https://github.com/DamonDu/Unity3D_Training/tree/master/Easy%20Factory%20Method)

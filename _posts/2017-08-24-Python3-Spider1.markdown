@@ -16,8 +16,6 @@ tags:
 
 ## 项目背景
 
-![](http://ompnv884d.bkt.clouddn.com/spider1.png)
-
 [AllMusic](http://www.allmusic.com/) 是一个关于音乐的元数据资料库，在1991年由流行文化维护者Michael Erlewine与数学家兼哲学博士Vladimir Bogdanov创立，目的是成为音乐消费者的导览。[AllMusic New Releases](http://www.allmusic.com/newreleases) 是 AllMusic 为用户提供的一项内容推荐服务，以周为频次向用户推荐本周的新音乐/新专辑，甚至你可以通过邮件的形式来订阅该内容。
 
 对于中重度音乐爱好者或习惯聆听新音乐的人群，[AllMusic New Releases](http://www.allmusic.com/newreleases) 提供了很优秀的推荐服务。作为一个严谨专业音乐资料库，AllMusic 提供十分专业且全面的音乐信息。于此同时，AllMusic 有一个由若干专家乐评人组成的内容团队，每周推荐的都是一些比较具有音乐性或话题性的专辑，同时也提供十分专业的乐评
@@ -56,8 +54,6 @@ def getOnePage(url, headers):
 这里我们需要爬取两方面的信息：一是我们需要获取的New Releases 的内容；二是需要从网页中获取日期信息来构成url(当然也可以直接通过算法计算，Allmusic 的更新日期是每周的周五)。
 
 #### 析取 New Releases 中的内容
-
-![](http://ompnv884d.bkt.clouddn.com/spider2.jpg)
 
 使用**Chrome的开发者工具**分析我们需要爬取的网页，观察我们关心的字段内容及其所在的标签。这里我们**使用正则表达式匹配**来解析，当然你也可以选择 BeautifulSoup、Pyquery 等网页解析库。
 

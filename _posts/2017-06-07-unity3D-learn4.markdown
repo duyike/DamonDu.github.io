@@ -16,23 +16,11 @@ tags:
 
 ​	射箭小游戏是一款射击类小游戏，游戏规则十分简单：玩家点击屏幕上的任意位置，弓箭就会向着鼠标所指的方向发射（注意弓箭会受到重力的影响）。玩家射中靶心得5分，每往外一环少一分，该游戏没有输赢设置。
 
-## 游戏展示
-
-​	![](http://ompnv884d.bkt.clouddn.com/Archery.gif)
-
-## 设计思路
-
-​	这次项目还是使用熟悉的MVC架构。设计类图如下所示：
-
-![](http://ompnv884d.bkt.clouddn.com/archeryuml.JPG)
-
 ## 开发过程
 
 ​	完整代码地址: [GitHub - DamonDu/Unity3D_Training/Archery](https://github.com/DamonDu/Unity3D_Training/tree/master/Archery)
 
 ### (一)构建预设与素材
-
-![](http://ompnv884d.bkt.clouddn.com/archery1.JPG)
 
 ​	先准备好游戏对象如箭靶、箭，设置的时候需要注意设置好`Rigidbody`属性和`Collider`属性。例如箭靶需要设置为`is Kinematic`避免它受到物理引擎的影响，而箭则需要设置`is Kinematic`为`false`并为其添加重力作用。至于`Collider`的设置，对于箭靶和箭头的圆柱体我选择了`Mesh Collider`，箭身则使用`Capsule Collider`，碰撞器的选择会影响到物理效果的精度，对后面计分功能也有影响，需要谨慎选择。另外，对于箭头与箭身的结合，我使用了`FixedJoint`组件，这在后文会详细介绍，在这里只要为箭头与箭身添加该组件即可。
 
