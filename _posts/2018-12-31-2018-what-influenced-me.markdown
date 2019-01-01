@@ -66,7 +66,7 @@ tags:
 
 #### Noname - Room 25 (2018.09.14)
 
-<a src="https://music.163.com/#/album?id=73256982"><img src="/img/in-post/2018-12-31-2018-what-influenced-me/Room 25.png"/></a>
+<img src="/img/in-post/2018-12-31-2018-what-influenced-me/Room 25.png"/>
 
 Noname 在2016年的处女作 “Telefone” 就让人对这个芝加哥黑人女 rapper 印象深刻。“Room 25” 可以视作 “Telefone” 的延续，音乐风格本质上还是对 90 年代的 Neo-Soul 和 Jazz Rap 的继承和致敬（像是 Common 和 Erykah Badu 的结合）。
 
@@ -76,7 +76,7 @@ Noname 在2016年的处女作 “Telefone” 就让人对这个芝加哥黑人�
 
 #### Jonathan Something - Outlandish Poetica (2018.11.07)
 
-<a src="https://jonathansomething.bandcamp.com/releases"><img src="/img/in-post/2018-12-31-2018-what-influenced-me/Outlandish Poetica.png"/></a>
+<img src="/img/in-post/2018-12-31-2018-what-influenced-me/Outlandish Poetica.png"/>
 
 荒诞，狂野，虚幻，Jonathan Something 在这张专辑里用一首叙事诗，企图架空音乐风格，架空叙事框架，架空自我情感。“Outlandish Poetica”，“Out On Death Row” 和 “Sunday, July 26” ，串起了这首诗的主线。
 
@@ -86,7 +86,7 @@ Noname 在2016年的处女作 “Telefone” 就让人对这个芝加哥黑人�
 
 #### 春ねむり - 春と修羅 (2018.04.11)
 
-<a src="https://music.163.com/#/album?id=38273162"><img src="/img/in-post/2018-12-31-2018-what-influenced-me/春と修羅.png"/></a>
+<img src="/img/in-post/2018-12-31-2018-what-influenced-me/春と修羅.png"/>
 
 「春と修羅」是1995年出生的春ねむり（Haru Nemuri，下文简称 haru）的第一张 LP 专辑。
 
@@ -96,7 +96,7 @@ Noname 在2016年的处女作 “Telefone” 就让人对这个芝加哥黑人�
 
 #### 徐佳莹 - 心里学 (2017.12.27)
 
-<a src="https://lastfm-img2.akamaized.net/i/u/770x0/4bcada388f23627d2c8e3e8ffccf9397.jpg#4bcada388f23627d2c8e3e8ffccf9397"><img src="/img/in-post/2018-12-31-2018-what-influenced-me/心里学.png"/></a>
+<img src="/img/in-post/2018-12-31-2018-what-influenced-me/心里学.png"/>
 
 徐佳莹作为“歌手”的成长轨迹和我作为“听众”的成长轨迹是契合的。
 
