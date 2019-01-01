@@ -96,7 +96,7 @@ Noname 在2016年的处女作 “Telefone” 就让人对这个芝加哥黑人�
 
 #### 徐佳莹 - 心里学 (2017.12.27)
 
-<a src="/img/in-post/2018-12-31-2018-what-influenced-me/心里学.png"><img src="/img/in-post/2018-12-31-2018-what-influenced-me/心里学.png"/></a>
+<a src="https://lastfm-img2.akamaized.net/i/u/770x0/4bcada388f23627d2c8e3e8ffccf9397.jpg#4bcada388f23627d2c8e3e8ffccf9397"><img src="/img/in-post/2018-12-31-2018-what-influenced-me/心里学.png"/></a>
 
 徐佳莹作为“歌手”的成长轨迹和我作为“听众”的成长轨迹是契合的。
 
