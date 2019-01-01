@@ -7,6 +7,8 @@ header-style: text
 catalog:    true
 tags:
     - 闲谈
+    - 互联网
+    - 音乐
 ---
 
 与其说这是个2018年的年度总结，不如说是个「好物分享」。
