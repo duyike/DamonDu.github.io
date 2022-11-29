@@ -1,5 +1,5 @@
-baseURL: "https://www.splitmusic.xyz/"
-title: SplitMusic
+baseURL: "https://yiked.xyz/"
+title: yikeD
 paginate: 5
 theme: PaperMod
 
@@ -22,9 +22,9 @@ outputs:
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
-  title: SplitMusic
-  description: "SplitMusic"
-  keywords: [Blog, SplitMusic]
+  title: yikeD
+  description: "yikeD"
+  keywords: [Blog, yikeD]
   author: Yike
   # author: ["Me", "You"] # multiple authors
   images: ["<link or path of image for opengraph, twitter-cards>"]
@@ -55,7 +55,7 @@ params:
     safari_pinned_tab: "/image/android-chrome-192x192.png"
 
   label:
-    text: SplitMusic
+    text: yikeD
     # icon: /apple-touch-icon.png
     # iconHeight: 25
 
